@@ -1,0 +1,27 @@
+Package: pantry
+Type: Package
+Version: 0.0.0.9000
+Title: Load bioinformatics datasets into a local database
+Description: This R package provides scripts to retrieve and load bioninformatics datasets.
+Authors@R: person("Matthew", "O'Meara", email = "mattjomeara@gmail.com",
+    role = c("aut", "cre"))
+URL: http://github.com/momeara/pantry
+BugReports: https://github.com/momeara/pantry/issues
+Depends:
+   R (>= 3.1.2)
+Imports:
+    assertthat,
+    assertr,
+    plyr,
+    dplyr,
+    magrittr,
+    jsonlite
+    stringr,
+    httr,
+    readr,
+    openxlsx
+License: MIT + file LICENSE
+Collage:
+    'quality_tests.R'
+    'id_utils.R'
+    'data_repo.R'

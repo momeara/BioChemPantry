@@ -1,0 +1,13 @@
+
+# Temporary files
+.\#*
+\#*\#
+*~
+
+# Temporary R files
+Rplots.pdf
+.Rhistory
+.Rbuildignore
+.RData
+
+
