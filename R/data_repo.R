@@ -8,12 +8,14 @@
 #library(jsonlite)
 
 
-# attach to the data repository, optionally using a schema. If the
-# specified schema doesn't exist, create it.
-#
-#'@login either the name of a json file with login information or a
-#' list of login info. The keys should correspond with the argument
-#' keys of the dplyr::src_postgres function.
+#' attach to the data repository, optionally using a schema. If the
+#' specified schema doesn't exist, create it.
+#'
+#' @param login either the name of a json file with login information or a
+#'   list of login info. The keys should correspond with the argument
+#'   keys of the dplyr::src_postgres function.
+#' @return a connection to the the data_repo
+#' @export
 get_data_repo <- function(schema=NULL, login="~/.data_repo_login"){
 	if(is.character(login)){
 		login <- fromJSON(login)
@@ -35,19 +37,24 @@ get_data_repo <- function(schema=NULL, login="~/.data_repo_login"){
 	return(data_repo)
 }
 
-
+#' Create a schema in the data_repo
+#' @export
 create_schema <- function(data_repo, schema_name){
 	require(DBI)
 	a <- data_repo$con %>%
 		dbGetQuery(paste0("CREATE SCHEMA ", schema_name %>% sql, ";"))
 }
 
+#' Drop a schema from the data_repo
+#' @export
 drop_schema <- function(data_repo, schema_name){
 	require(DBI)
 	a <- data_repo$con %>%
 		dbGetQuery(paste0("DROP SCHEMA ", schema_name %>% sql, " CASCADE;"))
 }
 
+#' Set a schema as the active schema
+#' @export
 set_schema <- function(data_repo, schema_name){
 	require(DBI)
 	if(is.null(schema_name)){
@@ -59,12 +66,16 @@ set_schema <- function(data_repo, schema_name){
 		dbGetQuery(paste0("SET search_path TO ", search_path, ";"))
 }
 
+#' Get the search path for looking for namespaces
+#' @export
 get_search_path <- function(data_repo){
 	require(DBI)
 	a <- data_repo$con %>% dbGetQuery("SHOW search_path")
 	str_split(a$search_path, ", ")[[1]]
 }
 
+#' Get all available schemas
+#' @export
 get_schemas <- function(data_repo, verbose=T){
 	if(verbose){
 		cat("Current schema: ", get_search_path(data_repo), "\n", sep="")
@@ -75,6 +86,8 @@ get_schemas <- function(data_repo, verbose=T){
 		data.frame
 }
 
+#' Get all tables in the active schema or search path
+#' @export
 get_tables <- function(data_repo, all_tables=FALSE){
 	require(DBI)
 	tables <- dbGetQuery(data_repo$con, paste0(
@@ -89,11 +102,15 @@ get_tables <- function(data_repo, all_tables=FALSE){
 	return(tables);
 }
 
+#' Drop a table
+#' @export
 drop_table <- function(data_repo, table){
 	require(DBI)
 	x <- dbGetQuery(data_repo$con, paste0("DROP TABLE ", table %>% sql, " CASCADE;"))
 }
 
+#' Identify a table qualified by a schema. This works around issue 244 in dplyr
+#' @export
 schema_tbl <- function(data_repo, schema_table){
 	require(dplyr)
 	# see http://stackoverflow.com/questions/21592266/i-cannot-connect-postgresql-schema-table-with-dplyr-package
@@ -101,9 +118,9 @@ schema_tbl <- function(data_repo, schema_table){
 	tbl(data_repo, structure(paste0("SELECT * FROM ",  schema_table), class=c("sql", "character")))
 }
 
-# this adds the fast argument working around a known problem in dplyr and DBI
-# https://github.com/hadley/dplyr/issues/1471
-# https://github.com/rstats-db/DBI/issues/62
+#' this adds the fast argument working around a known problem in dplyr and DBI
+#' https://github.com/hadley/dplyr/issues/1471
+#' https://github.com/rstats-db/DBI/issues/62
 copy_to.src_postgres <- function(
 	dest, df, name = deparse(substitute(df)),
 	types = NULL, temporary = TRUE, indexes = NULL,

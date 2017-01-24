@@ -2,60 +2,57 @@
 # vi: set ts=2 noet:
 
 
-# Diagnostics for messy joins
-#
-# given a data frame with two ways to group rows,
-# summarize and give examples of situations where the mapping is not 1-1
-#
-#data <- data.frame(
-#	x=c(1,2,NA,3,4,5,6,6,6,7,7),
-#	y=c("a",NA,"c","d","d","d","e","f","g","h","h"))
-#
-#> summarize_map(data, "x", "y")
-#X<-[x]:
-#  |X|: 7                          # number of groups
-#  |is.na.X|: 1                    # number of groups with NA in atleaset 1 col
-#  range(|x|:X): 1, 3              # size range of groups
-#Y<-[y]:
-#  |Y|: 7
-#  |is.na.Y|: 1
-#  range(|y|:Y): 1, 3
-#[X U Y]:                          # grouping by the union of xcols and ycols
-#  |X U Y|: 8
-#  |is.na.XUY|: 2
-#  range(|z|:X U Y): 1, 2
-#[X @ Y]:
-#  |X ~ Y|: 5
-#  |X:X < Y|, |Y:Y < X|: 1, 1
-#  |X:X > Y|, |Y:Y < X|: 3, 3
-#$is.na.X
-#   x y
-#1 NA c
-#
-#$is.na.Y
-#  x    y
-#1 2 <NA>
-#
-#$dup.XUY
-#  x y
-#1 7 h
-#2 7 h
-#
-#$dup.X
-#  x y
-#1 6 e
-#2 6 f
-#3 6 g
-#
-#$dup.Y
-#  y x
-#1 d 3
-#2 d 4
-#3 d 5
-
-
-
-
+#'  Diagnostics for messy joins
+#'
+#'  given a data frame with two ways to group rows,
+#'  summarize and give examples of situations where the mapping is not 1-1
+#'
+#' data <- data.frame(
+#' 	x=c(1,2,NA,3,4,5,6,6,6,7,7),
+#' 	y=c("a",NA,"c","d","d","d","e","f","g","h","h"))
+#'
+#' > summarize_map(data, "x", "y")
+#' X<-[x]:
+#'   |X|: 7                          # number of groups
+#'   |is.na.X|: 1                    # number of groups with NA in atleaset 1 col
+#'   range(|x|:X): 1, 3              # size range of groups
+#' Y<-[y]:
+#'   |Y|: 7
+#'   |is.na.Y|: 1
+#'   range(|y|:Y): 1, 3
+#' [X U Y]:                          # grouping by the union of xcols and ycols
+#'   |X U Y|: 8
+#'   |is.na.XUY|: 2
+#'   range(|z|:X U Y): 1, 2
+#' [X @ Y]:
+#'   |X ~ Y|: 5
+#'   |X:X < Y|, |Y:Y < X|: 1, 1
+#'   |X:X > Y|, |Y:Y < X|: 3, 3
+#' $is.na.X
+#'    x y
+#' 1 NA c
+#'
+#' $is.na.Y
+#'   x    y
+#' 1 2 <NA>
+#'
+#' $dup.XUY
+#'   x y
+#' 1 7 h
+#' 2 7 h
+#'
+#' $dup.X
+#'   x y
+#' 1 6 e
+#' 2 6 f
+#' 3 6 g
+#'
+#' $dup.Y
+#'   y x
+#' 1 d 3
+#' 2 d 4
+#' 3 d 5
+#' @export
 summarize_map <- function(data, xcols, ycols, n_examples=4, verbose=F){
 
 	if(verbose){

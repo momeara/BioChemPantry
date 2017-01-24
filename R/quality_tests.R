@@ -1,6 +1,7 @@
 
-# test if the columns names(ids) are symmetric to the columns ids
-# and for those that are symmetric, test equality over the value columns
+#' test if the columns names(ids) are symmetric to the columns ids
+#' and for those that are symmetric, test equality over the value columns
+#' @export
 test_is_symmetric <- function(data, ids, values){
 	library(plyr)
 	library(dplyr)
@@ -22,26 +23,33 @@ test_is_symmetric <- function(data, ids, values){
 	return(n_different == 0)
 }
 
+#' make a dataset symmetric
+#' @export
 make_symmetric <- function(data, ids){
 	data %>%
 		rbind(data %>% rename_(.dots=ids)) %>%
 		distinct_(.dots=c(ids, names(ids)))
 }
 
-
+#' test fraction null
+#' @export
 test_null_frac <- function(data, ids, frac){
 	library(plyr)
 	library(dplyr)
 	(((data %>% select_(.dots=ids) %>% complete.cases) / nrow) < frac) %>% return
 }
 
+#' test number null
+#' @export
 test_null_count <- function(data, ids, count){
 	library(plyr)
 	library(dplyr)
 	((data %>% select_(.dots=ids) %>% complete.cases) < count) %>% return
 }
 
-# e.g. for testing for network loops
+#' test distinct rows
+#' e.g. for testing for network loops
+#' @export
 test_distinct <- function(data, ids){
 	(nrow(data) == nrow(data %>% distinct_(.dots=ids))) %>% return
 }
