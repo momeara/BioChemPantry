@@ -2,19 +2,19 @@
 % Please edit documentation in R/pantry.R
 \name{get_pantry}
 \alias{get_pantry}
-\title{attach to the data repository, optionally using a schema. If the
+\title{Attach to the pantry database, optionally using a schema. If the
 specified schema doesn't exist, create it.}
 \usage{
-get_pantry(schema = NULL, login_info = "~/.pantry_login")
+get_pantry(schema = NULL, pantry_config = "~/.pantry_config")
 }
 \arguments{
-\item{login_info}{see get_pantry_login}
+\item{pantry_config}{see get_pantry_config}
 }
 \value{
 a connection to the the pantry
 }
 \description{
-attach to the data repository, optionally using a schema. If the
+Attach to the pantry database, optionally using a schema. If the
 specified schema doesn't exist, create it.
 }
 
