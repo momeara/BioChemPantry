@@ -6,14 +6,19 @@ library(plyr)
 library(dplyr)
 library(readr)
 library(assertthat)
+library(BioChemPantry)
 
 source("scripts/4__activity_types.R")
+staging_directory <- get_staging_directory("chembl21")
+chembl_db <- get_pantry("chembl21")
 
-target_info <- read_tsv("data/target_info.tsv")
-zinc_to_chembl <- read_tsv("data/zinc_to_chembl.tsv")
-chembl_to_aggregators <- read_tsv("data/chembl_to_aggregators_160704.tsv")
 
-chembl_db <- get_data_repo("chembl21")
+target_info <- read_tsv(paste0(staging_directory, "/data/target_info.tsv"))
+zinc_to_chembl <- read_tsv(paste0(staging_directory, "/data/zinc_to_chembl.tsv"))
+chembl_to_aggregators <- read_tsv(
+	paste0(staging_directory, "/data/chembl_to_aggregators_160704.tsv")
+
+
 
 c("assays", "activities", "target_dictionary", "target_components",
 	"component_sequences", "chembl_id_lookup", "compound_structures",
@@ -35,7 +40,7 @@ target_components_tbl <- chembl_db %>% tbl("target_components")
 
 
 ### explore data criteria
-target_dictionary_tbl %>% count(target_type, sort=T) %>% collect(n=Inf) %>% data.frame
+target_dictionary_tbl %>% count(target_type, sort=T) %>% collect(n=Inf) %>% cdata.frame
 
 
 # any duplicate smiles?
@@ -265,8 +270,8 @@ full_chembl_data <- full_chembl_data %>%
 
 ##### Save data ####
 
-full_chembl_data %>% write_tsv("data/full_chembl_data.tsv")
-save("full_chembl_data", file="data/full_chembl_data.Rdata")
+full_chembl_data %>% write_tsv(paste0(staging_directory, "/data/full_chembl_data.tsv"))
+save("full_chembl_data", file=paste0(staging_directory, "/data/full_chembl_data.Rdata"))
 
 
 

@@ -4,19 +4,20 @@
 library(plyr)
 library(dplyr)
 library(readr)
+library(BioChemPantry)
 source("~/work/sea/scripts/id_utils.R")
-source("~/work/sea/scripts/data_repo.R")
+
 
 # the idea is to use HGNC's HCOP data to identify orthologs
 # So far I've collected the data and started to look at it.
-# the map 
 
+staging_directory <- get_staging_directory("hgnc/release_160324")
 
-human_orthologs_fname <- "data/human_all_hcop_sixteen_column.txt"
+human_orthologs_fname <- paste0(staging_directory, "/data/human_all_hcop_sixteen_column.txt")
 system(paste0(
    "wget 'ftp://ftp.ebi.ac.uk/pub/databases/genenames/hcop/human_all_hcop_sixteen_column.txt.gz' ",
    "-O ", human_orthologs_fname))
-system(past0("cd data && tar -xzvf ", human_orthologs_fname))
+system(past0("cd ", staging_directory, "/data && tar -xzvf ", human_orthologs_fname))
 
 
 #prepend "row_id	" to the header row

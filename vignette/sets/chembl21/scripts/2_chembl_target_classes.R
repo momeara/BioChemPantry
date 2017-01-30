@@ -5,7 +5,7 @@ library(plyr)
 library(dplyr)
 library(reshape2)
 library(readr)
-source("~/work/sea/scripts/data_repo.R")
+library(BioChemPantry)
 
 # chembl stores protein classes as tree structured ontology this
 # converts it into a flat format where the classes with higher numbers
@@ -24,7 +24,9 @@ source("~/work/sea/scripts/data_repo.R")
 #   $ class_6         : chr  "GABAA" "CHRN alpha" "Transcription Factor" "CHRN alpha" ...
 
 
-chembl_db <- get_data_repo("chembl21")
+chembl_db <- get_pantry("chembl21")
+
+staging_directory <- get_staging_directory("chembl21")
 
 protein_class_ids <- chembl_db %>%
 	tbl("protein_classification") %>%
@@ -102,4 +104,4 @@ chembl_target_classes <-
 
 chembl_target_classes %>%
 	write_tsv(
-		"data/chembl_target_classes.tsv")
+		paste0(staging_directory, "/data/chembl_target_classes.tsv"))

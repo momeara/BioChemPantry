@@ -13,12 +13,15 @@ library(XML)
 #####################################
 # Analysis parameters
 
+staging_directory <- get_staging_directory("hmdb")
+
 # input paths
 hmdb_metabolites_xml_paths <- paste0(
-	"data/hmdb_metabolites_xml/",
-	list.files("data/hmdb_metabolites_xml", "HMDB[0-9]+.xml"))
+	staging_directory, "/data/hmdb_metabolites_xml/",
+	list.files(paste0(staging_directory, "/data/hmdb_metabolites_xml", "HMDB[0-9]+.xml")))
 
-hmdb_metabolite_activities_fname <- "data/hmdb_metabolite_activities_140908.csv"
+hmdb_metabolite_activities_fname <- paste0(
+	staging_directory, "/data/hmdb_metabolite_activities_140908.csv")
 ####################################
 # prepare primary data
 

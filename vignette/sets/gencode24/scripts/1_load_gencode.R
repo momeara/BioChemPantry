@@ -4,20 +4,20 @@
 library(plyr)
 library(dplyr)
 library(seqinr)
+library(BioChemPantry)
 
-data_repo <- get_data_repo()
-data_repo %>% create_schema("gencode24")
-data_repo %>% set_schema("gencode24")
+pantry <- get_pantry("gencode24")
 
-system("
-mkdir dump
-cd dump
+staging_directory <- get_staging_directory("gencode24")
+
+system(paste0("
+cd ", staging_directory, "
 wget ftp://ftp.sanger.ac.uk/pub/gencode/Gencode_human/release_24/gencode.v24.pc_translations.fa.gz
 gunzip gencode.v24.pc_translations.fa.gz
-")
+"))
 
 protein_sequences <- seqinr::read.fasta(
-	"dump/gencode.v24.pc_translations.fa",
+	paste0(staging_directory, "/dump/gencode.v24.pc_translations.fa"),
 	seqtype="AA",
 	as.string=T) %>%
 	plyr::adply(1, function(df){
@@ -33,7 +33,7 @@ protein_sequences <- seqinr::read.fasta(
 	dplyr::select(-X1)
 
 
-data_repo %>% copy_to(
+pantry %>% copy_to(
 	df=protein_sequences,
 	name="protein_sequences",
 	temporary=F,

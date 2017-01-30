@@ -4,13 +4,14 @@
 library(plyr)
 library(dplyr)
 library(readr)
+library(BioChemPantry)
 
 source("~/work/sea/scripts/sea.R")
 
+staging_directory <- get_staging_directory("chembl21")
+load(paste0(staging_directory, "/data/full_chembl_data.Rdata"))
 
-load("data/full_chembl_data.Rdata")
-
-library_fname <-"data/chembl21_ECFC6.sea"
+library_fname <-paste0(staging_directory, "/data/chembl21_ECFC6.sea")
 fingerprint_type <- "rdkit_ecfc"
 name <- "ChEMBL21_by_uniprot_entry_to_zinc_id_ECFC6"
 
@@ -67,8 +68,8 @@ pack.library(
 chembl_targets <- target_info %>%
 	semi_join(lib$targets, by=c("uniprot_entry" = "target"))
 
-chembl_targets %>% write_tsv("data/chembl_targets.tsv")
-save("chembl_targets", file="data/chembl_targets.Rdata")
+chembl_targets %>% write_tsv(paste0(staging_directory, "/data/chembl_targets.tsv"))
+save("chembl_targets", file=paste0(staging_directory, "/data/chembl_targets.Rdata"))
 
 chembl_compounds <- full_chembl_data %>%
 	distinct(zinc_id, .keep_all=T) %>%
@@ -90,8 +91,8 @@ chembl_compounds <- full_chembl_data %>%
 		molecular_species,
 		n_heavy_atoms)
 
-chembl_compounds %>% write_tsv("data/chembl_compounds.tsv")
-save("chembl_compounds", file="data/chembl_compounds.Rdata")
+chembl_compounds %>% write_tsv(paste0(staging_directory, "/data/chembl_compounds.tsv"))
+save("chembl_compounds", file=paste0(staging_directory, "/data/chembl_compounds.Rdata"))
 
 
 chembl_activities <- full_chembl_data %>%
@@ -120,8 +121,8 @@ chembl_activities <- full_chembl_data %>%
 		doi,
 		pubmed_id)
 
-chembl_activities %>% write_tsv("data/chembl_activities.tsv")
-save("chembl_activities", file="data/chembl_activities.Rdata")
+chembl_activities %>% write_tsv(paste0(staging_directory, "/data/chembl_activities.tsv"))
+save("chembl_activities", file=paste0(staging_directory, "/data/chembl_activities.Rdata"))
 
 
 

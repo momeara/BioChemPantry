@@ -7,80 +7,110 @@
 #library(stringr)
 #library(jsonlite)
 
-
-#' attach to the data repository, optionally using a schema. If the
-#' specified schema doesn't exist, create it.
+#' Get and check login information for Postgres database
 #'
-#' @param login either the name of a json file with login information or a
-#'   list of login info. The keys should correspond with the argument
+#' @param pantry_config either the name of a json file with config information or
+#'   the config info parsed into a list. The login key should correspond with the argument
 #'   keys of the dplyr::src_postgres function.
-#' @return a connection to the the data_repo
+#' @return list of login parameters for Postgres database
 #' @export
-get_data_repo <- function(schema=NULL, login="~/.data_repo_login"){
-	if(is.character(login)){
-		login <- fromJSON(login)
-	} else if(!is.list(login)){
+get_pantry_config <- function(pantry_config="~/.pantry_config"){
+	if(is.character(pantry_config)){
+		pantry_config <- fromJSON(pantry_config)
+	} else if(!is.list(config_config)){
 		stop("Login must either be the name of a json file of login info, or a list of login info.\n")
 	}
+	pantry_config
+}
+
+#' Get the staging directory for the given dataset
+#'
+#' @param data_set A tag for the given dataset
+#' @param pantry_config see get_pantry_config
+#' @return '<pantry_config$staging_dir>/<data_set>', creating the directory if necessary
+#' @export
+get_staging_directory <- function(data_set, pantry_config="~/.pantry/config"){
+	pantry_config <- get_pantry_config(pantry_config)
+	staging_directory <- paste0(pantry_config$staging_directory, "/", data_set)
+	if(!file.exists(staging_directory)){
+		tryCatch({
+			dir.create(staging_directory, recursive=TRUE)
+		}, error=function(e){
+			stop(paste0("Unable to get staging area for dataset '", data_set, "': '", staging_directory, "'."))
+		})
+	}
+	staging_directory
+}
+
+#' Attach to the pantry database, optionally using a schema. If the
+#' specified schema doesn't exist, create it.
+#'
+#' @param pantry_config see get_pantry_config
+#' @return a connection to the the pantry
+#' @export
+get_pantry <- function(schema=NULL, pantry_config="~/.pantry_config"){
+	pantry_config <- get_pantry_config(pantry_config)
+
 	if(!is.null(schema)){
 		schema <- tolower(schema)
 	}
-	data_repo <- do.call(dplyr::src_postgres, login)
+
+	pantry <- do.call(dplyr::src_postgres, pantry_config$login)
 
 	if(!is.null(schema)){
-		schemas <- get_schemas(data_repo)
+		schemas <- get_schemas(pantry)
 		if(!(schema %in% schemas$schema_name)){
-			stop(paste0("Schema '", schema, "' doesn't exist. To create it do:\n\n  data_repo <- get_data_repo()\n  data_repo %>% create_schema('", schema, "')\n  data_repo %>% set_schema('", schema, "')\n"))
+			stop(paste0("Schema '", schema, "' doesn't exist. To create it do:\n\n  pantry <- get_pantry()\n  pantry %>% create_schema('", schema, "')\n  pantry %>% set_schema('", schema, "')\n"))
 		}
-		set_schema(data_repo, schema)
+		set_schema(pantry, schema)
 	}
-	return(data_repo)
+	return(pantry)
 }
 
-#' Create a schema in the data_repo
+#' Create a schema in the pantry
 #' @export
-create_schema <- function(data_repo, schema_name){
+create_schema <- function(pantry, schema_name){
 	require(DBI)
-	a <- data_repo$con %>%
+	a <- pantry$con %>%
 		dbGetQuery(paste0("CREATE SCHEMA ", schema_name %>% sql, ";"))
 }
 
-#' Drop a schema from the data_repo
+#' Drop a schema from the pantry
 #' @export
-drop_schema <- function(data_repo, schema_name){
+drop_schema <- function(pantry, schema_name){
 	require(DBI)
-	a <- data_repo$con %>%
+	a <- pantry$con %>%
 		dbGetQuery(paste0("DROP SCHEMA ", schema_name %>% sql, " CASCADE;"))
 }
 
 #' Set a schema as the active schema
 #' @export
-set_schema <- function(data_repo, schema_name){
+set_schema <- function(pantry, schema_name){
 	require(DBI)
 	if(is.null(schema_name)){
 		search_path <- paste("\"$user\"", "public", sep=",")
 	} else {
 		search_path <- paste("\"$user\"", schema_name, "public", sep=",")
 	}
-	a <- data_repo$con %>%
+	a <- pantry$con %>%
 		dbGetQuery(paste0("SET search_path TO ", search_path, ";"))
 }
 
 #' Get the search path for looking for namespaces
 #' @export
-get_search_path <- function(data_repo){
+get_search_path <- function(pantry){
 	require(DBI)
-	a <- data_repo$con %>% dbGetQuery("SHOW search_path")
+	a <- pantry$con %>% dbGetQuery("SHOW search_path")
 	str_split(a$search_path, ", ")[[1]]
 }
 
 #' Get all available schemas
 #' @export
-get_schemas <- function(data_repo, verbose=T){
+get_schemas <- function(pantry, verbose=T){
 	if(verbose){
-		cat("Current schema: ", get_search_path(data_repo), "\n", sep="")
+		cat("Current schema: ", get_search_path(pantry), "\n", sep="")
 	}
-	data_repo %>%
+	pantry %>%
 		tbl(build_sql("SELECT schema_name FROM information_schema.schemata")) %>%
 		collect %>%
 		data.frame
@@ -88,12 +118,12 @@ get_schemas <- function(data_repo, verbose=T){
 
 #' Get all tables in the active schema or search path
 #' @export
-get_tables <- function(data_repo, all_tables=FALSE){
+get_tables <- function(pantry, all_tables=FALSE){
 	require(DBI)
-	tables <- dbGetQuery(data_repo$con, paste0(
+	tables <- dbGetQuery(pantry$con, paste0(
 		"SELECT schemaname, tablename FROM pg_tables ",
 		"WHERE schemaname != 'information_schema' AND schemaname !='pg_catalog'"))
-	schema <- get_search_path(data_repo)
+	schema <- get_search_path(pantry)
 	if(!all_tables){
 		if(length(schema) > 0){
 			tables <- tables[tables$schemaname %in% schema,]
@@ -104,18 +134,18 @@ get_tables <- function(data_repo, all_tables=FALSE){
 
 #' Drop a table
 #' @export
-drop_table <- function(data_repo, table){
+drop_table <- function(pantry, table){
 	require(DBI)
-	x <- dbGetQuery(data_repo$con, paste0("DROP TABLE ", table %>% sql, " CASCADE;"))
+	x <- dbGetQuery(pantry$con, paste0("DROP TABLE ", table %>% sql, " CASCADE;"))
 }
 
 #' Identify a table qualified by a schema. This works around issue 244 in dplyr
 #' @export
-schema_tbl <- function(data_repo, schema_table){
+schema_tbl <- function(pantry, schema_table){
 	require(dplyr)
 	# see http://stackoverflow.com/questions/21592266/i-cannot-connect-postgresql-schema-table-with-dplyr-package
 	# https://github.com/hadley/dplyr/issues/244
-	tbl(data_repo, structure(paste0("SELECT * FROM ",  schema_table), class=c("sql", "character")))
+	tbl(pantry, structure(paste0("SELECT * FROM ",  schema_table), class=c("sql", "character")))
 }
 
 #' this adds the fast argument working around a known problem in dplyr and DBI

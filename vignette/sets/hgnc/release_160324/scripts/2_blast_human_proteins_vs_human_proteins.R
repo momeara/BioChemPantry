@@ -7,13 +7,14 @@ library(readr)
 library(seqinr)
 library(stringr)
 library(Bethany)
+library(BioChemPantry)
 source("~/work/sets/uniprot_idmapping/scripts/uniprot_id_map.R")
-source("~/work/sea/scripts/data_repo.R")
 
-data_repo <- get_data_repo("hgnc_151123")
+pantry <- get_pantry("hgnc_151123")
+staging_directory <- get_staging_directory("hgnc_151123")
 
-genes <- data_repo %>% tbl("genes") %>% collect
-hgnc_human_fname <- "data/uniprot_151123/hgnc_human.fasta"
+genes <- pantry %>% tbl("genes") %>% collect
+hgnc_human_fname <- paste0(staging_directory, "/data/uniprot_151123/hgnc_human.fasta")
 
 
 scores <- blastp(hgnc_human_fname, hgnc_human_fname, "hgnc_human")
@@ -44,7 +45,7 @@ scores <- scores %>%
 				uniprot_entry2 = uniprot_entry),
 		by="uniprot_accn2")
 
-data_repo %>% copy_to(
+pantry %>% copy_to(
 	df=scores,
 	name="blastp_target_vs_target",
 	temporary=F,

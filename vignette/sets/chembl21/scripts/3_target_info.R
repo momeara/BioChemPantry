@@ -5,9 +5,10 @@ library(plyr)
 library(dplyr)
 library(readr)
 library(assertr)
+library(BioChemPantry)
 
-
-chembl_db <- get_data_repo("chembl21")
+chembl_db <- get_pantry("chembl21")
+staging_directory <- get_staging_directory("chembl21")
 
 chembl_targets <- chembl_db %>% dplyr::tbl("component_sequences") %>%
 	dplyr::rename(uniprot_accn = accession) %>%
@@ -119,7 +120,7 @@ uniprot_targets <- uniprot_targets %>% rename(
 	dplyr::mutate(
 		entrez_id = entrez_id_alt %>% str_extract("^[0-9]+")
 
-uniprot_targets %>% write_tsv("data/uniprot_targets_raw_160627.tsv")
+uniprot_targets %>% write_tsv(paste0(staging_directory, "/data/uniprot_targets_raw_160627.tsv"))
 
 problems <- dplyr::full_join(
 	chembl_targets %>%
@@ -149,7 +150,7 @@ uniprot_targets_full <- httr::GET(
 	head(-1) # copyright notice
 
 
-target_classes <- read_tsv("data/chembl_target_classes.tsv") %>%
+target_classes <- read_tsv(paste0(staging_directory, "/data/chembl_target_classes.tsv")) %>%
 	dplyr::select(uniprot_accn, class_1, class_2, class_3, class_4, class_5, class_6) %>%
 	dplyr::distinct(uniprot_accn, .keep_all=T)
 
@@ -159,4 +160,4 @@ target_info <- chembl_targets %>%
 
 
 target_info %>%
-	write_tsv("data/target_info.tsv")
+	write_tsv(paste0(staging_directory, "/data/target_info.tsv"))

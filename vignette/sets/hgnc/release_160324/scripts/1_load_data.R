@@ -5,21 +5,22 @@ library(plyr)
 library(dplyr)
 library(jsonlite)
 library(readr)
+library(BioChemPantry)
 source("~/work/sea/scripts/id_utils.R")
-source("~/work/sea/scripts/data_repo.R")
+
 source("~/work/sets/uniprot_idmapping/scripts/uniprot_id_map_web.R")
 
 # collect genes with gene products from HGNC
 # Each gene symbol corresponds to at most one uniprot accn
 # but some uniprot entries correspond to multiple gene ids most of these are pretty weird or uncharacterized gene products, so filter all these out
 
+staging_directory <- get_staging_directory("hgnc/release_160324")
 
-system("
-mkdir data
-cd data
-wget ftp://ftp.ebi.ac.uk/pub/databases/genenames/new/json/locus_types/gene_with_protein_product.json")
+system(paste0("
+cd ", staging_directory, "
+wget ftp://ftp.ebi.ac.uk/pub/databases/genenames/new/json/locus_types/gene_with_protein_product.json"))
 
-genes <- jsonlite::fromJSON(txt="data/gene_with_protein_product.json")$response$docs
+genes <- jsonlite::fromJSON(txt=paste0(staging_directory, "/data/gene_with_protein_product.json")$response$docs
 
 genes %>% summarize_map("hgnc_id", "symbol")
 # hgnc_id, gene_symbol are 1-1
@@ -112,11 +113,11 @@ genes2 <- genes %>%
 
 
 
-data_repo <- get_data_repo()
-data_repo %>% create_schema("hgnc_151120")
-data_repo %>% set_schema("hgnc_151120")
+pantry <- get_pantry()
+pantry %>% create_schema("hgnc_151120")
+pantry %>% set_schema("hgnc_151120")
 
-data_repo %>% dplr::copy_to(
+pantry %>% dplr::copy_to(
 	genes2,
 	"genes",
 	temporary=F,

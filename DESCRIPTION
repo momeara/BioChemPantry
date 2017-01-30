@@ -1,4 +1,4 @@
-Package: pantry
+Package: BioChemPantry
 Type: Package
 Version: 0.0.0.9000
 Title: Load bioinformatics datasets into a local database
@@ -24,5 +24,5 @@ Imports:
 License: MIT + file LICENSE
 Collage: 'quality_tests.R'
     'id_utils.R'
-    'data_repo.R'
+    'pantry.R'
 RoxygenNote: 5.0.1

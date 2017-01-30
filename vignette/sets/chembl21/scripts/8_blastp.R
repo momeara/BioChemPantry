@@ -5,11 +5,13 @@ library(plyr)
 library(dplyr)
 library(Bethany)
 library(seqinr)
-source("~/work/sea/scripts/data_repo.R")
+library(BioChemPantry)
 
-data_repo <- get_data_repo("sea_chembl21")
+pantry <- get_pantry("sea_chembl21")
+staging_directory <- get_staging_directory("chembl21")
+gencode_staging_directory <- get_staging_directory("gencode24")
 
-chembl_target_sequences <- data_repo %>%
+chembl_target_sequences <- pantry %>%
 	dplyr::tbl("targets") %>%
 	dplyr::select(uniprot_entry, sequence) %>%
 	dplyr::collect(n=Inf)
@@ -32,7 +34,7 @@ scores <- Bethany::blastp(
 	arrange(EValue) %>%
 	distinct(target1, target2, .keep_all=T)
 
-data_repo %>% copy_to(
+pantry %>% copy_to(
 	df=scores,
 	name="blastp_target_vs_target",
 	temporary=F,
@@ -45,7 +47,7 @@ data_repo %>% copy_to(
 
 # compute target_vs_human blast scores
 scores_human <- blastp(
-	ref=paste0(getwd(), "/../gencode24/dump/gencode.v24.pc_translations.fa"),
+	ref=paste0(gencode_staging_directory, "/dump/gencode.v24.pc_translations.fa"),
 	query=chembl_sequences,
 	run_id="blastp_chembl21_vs_gencode_v24_human",
 	verbose=T) %>%
@@ -80,7 +82,7 @@ scores_human <- scores_human %>%
 
 
 
-data_repo %>% copy_to(
+pantry %>% copy_to(
 	df=scores_human,
 	name="blastp_target_vs_human",
 	temporary=F,

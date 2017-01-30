@@ -4,26 +4,26 @@
 library(plyr)
 library(dplyr)
 library(readr)
-source("~/work/sea/scripts/data_repo.R")
+library(BioChemPantry)
 
+staging_directory <- get_staging_directory("chembl21")
+target_info <- read_tsv(paste0(staging_directory, "/data/target_info.tsv"))
+load(paste0(staging_directory, "/data/chembl_compounds.Rdata"))
+load(paste0(staging_directory, "/data/chembl_activities.Rdata"))
+scores <- read_csv(paste0(staging_directory, "/data/chembl21.scores.csv"))
 
-target_info <- read_tsv("data/target_info.tsv")
-load("data/chembl_compounds.Rdata")
-load("data/chembl_activities.Rdata")
-scores <- read_csv("data/chembl21.scores.csv")
+pantry <- get_pantry()
+pantry %>% create_schema('sea_chembl21')
+pantry %>% set_schema('sea_chembl21')
 
-data_repo <- get_data_repo()
-data_repo %>% create_schema('sea_chembl21')
-data_repo %>% set_schema('sea_chembl21')
-
-data_repo %>%
+pantry %>%
 	copy_to(
 		target_info,
 		"targets",
 		temporary=F,
 		indices=list("uniprot_accn", "uniprot_entry", "gene_name", "entrez_id"))
 
-z <- data_repo %>%
+z <- pantry %>%
 	copy_to(
 		chembl_compounds,
 		"compounds",
@@ -31,7 +31,7 @@ z <- data_repo %>%
 		indices=list("zinc_id", "chembl_id"),
 		fast=T)
 
-z <- data_repo %>%
+z <- pantry %>%
 	copy_to(
 		chembl_activities,
 		"activities",
@@ -40,7 +40,7 @@ z <- data_repo %>%
 			c("uniprot_entry", "chembl_id")),
 		fast=T)
 
-data_repo %>%
+pantry %>%
 	copy_to(
 		scores,
 		"scores",

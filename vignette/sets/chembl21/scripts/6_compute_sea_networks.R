@@ -5,15 +5,18 @@ library(plyr)
 library(dplyr)
 library(readr)
 library(fdrtool)
+library(BioChemPantry)
 source("~/work/sea/scripts/sea.R")
 
-target_info <- read_tsv("data/target_info.tsv")
+staging_directory <- get_staging_directory("chembl21")
 
-sea_library_fname <- paste0(getwd(), "/data/chembl21.sea")
-run_base <- paste0(getwd(), "/data/runs/chembl21_vs_chembl21")
-sea_wrapper_fname <- paste0(getwd(), "/scripts/sea-wrapper.sh")
+target_info <- read_tsv(paste0(staging_directory, "/data/target_info.tsv")
 
-scores_fname <- paste0(getwd(), "/data/chembl21.scores.csv")
+sea_library_fname <- paste0(staging_directory, "/data/chembl21.sea")
+run_base <- paste0(staging_directory, "/data/runs/chembl21_vs_chembl21")
+sea_wrapper_fname <- paste0(staging_directory, "/scripts/sea-wrapper.sh")
+
+scores_fname <- paste0(staging_directory, "/data/chembl21.scores.csv")
 
 
 ####

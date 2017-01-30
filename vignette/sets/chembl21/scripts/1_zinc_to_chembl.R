@@ -9,6 +9,8 @@ library(Zr)
 
 source("~/work/sea/scripts/zinc_tools.R")
 
+staging_directory <- get_staging_directory("chembl21")
+
 zinc_to_chembl <- catalog_items(
 	catalog_short_name="chembl21",
 	output_fields=c(
@@ -102,7 +104,7 @@ zinc_to_chembl %>%
 	assertr::verify(chembl_id %>% str_detect("^CHEMBL[0-9]{1,7}$"))
 
 zinc_to_chembl %>%
-	readr::write_tsv("data/zinc_to_chembl.tsv")
+	readr::write_tsv(paste0(staging_directory, "/data/zinc_to_chembl.tsv"))
 
 
 aggregators <- catalog_items(
@@ -113,7 +115,7 @@ aggregators <- catalog_items(
 	verbose=T)
 
 aggregators %>%
-	readr::write_tsv("data/aggregators_160703.tsv")
+	readr::write_tsv(paste0(staging_directory, "/data/aggregators_160703.tsv"))
 
 
 ## chembl compounds similar ot aggregators
@@ -132,7 +134,8 @@ chembl_to_aggregators <- chembl_to_aggregators %>%
 		chembl_id = compound,
 		MaxTC_aggregator = MaxTC)
 
-chembl_to_aggregators %>% readr::write_tsv("data/chembl_to_aggregators_160704.tsv")
+chembl_to_aggregators %>%
+	readr::write_tsv(paste0(staging_directory, "/data/chembl_to_aggregators_160704.tsv"))
 
 
 
