@@ -16,7 +16,7 @@
 #' @export
 get_pantry_config <- function(pantry_config="~/.pantry_config"){
 	if(is.character(pantry_config)){
-		pantry_config <- fromJSON(pantry_config)
+		pantry_config <- jsonlite::fromJSON(pantry_config)
 	} else if(!is.list(config_config)){
 		stop("Login must either be the name of a json file of login info, or a list of login info.\n")
 	}
