@@ -3,14 +3,13 @@
 \name{copy_to.src_postgres}
 \alias{copy_to.src_postgres}
 \title{this adds the fast argument working around a known problem in dplyr and DBI
-https://github.com/hadley/dplyr/issues/1471
-https://github.com/rstats-db/DBI/issues/62}
+https://github.com/hadley/dplyr/blob/master/R/tbl-sql.r#L294}
 \usage{
 copy_to.src_postgres(dest, df, name = deparse(substitute(df)), types = NULL,
-  temporary = TRUE, indexes = NULL, analyze = TRUE, fast = FALSE, ...)
+  temporary = TRUE, unique_indexes = NULL, indexes = NULL,
+  analyze = TRUE, fast = FALSE, ...)
 }
 \description{
-this adds the fast argument working around a known problem in dplyr and DBI
 https://github.com/hadley/dplyr/issues/1471
 https://github.com/rstats-db/DBI/issues/62
 }

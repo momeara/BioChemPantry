@@ -56,7 +56,7 @@ get_pantry <- function(schema=NULL, pantry_config="~/.pantry_config"){
 		if(!(schema %in% schemas$schema_name)){
 			stop(paste0("Schema '", schema, "' doesn't exist. To create it do:\n\n  pantry <- get_pantry()\n  pantry %>% create_schema('", schema, "')\n  pantry %>% set_schema('", schema, "')\n"))
 		}
-		BioChemPantry::set_schema(pantry, schema)
+		pantry %>% BioChemPantry::set_schema(schema)
 	}
 	return(pantry)
 }
@@ -64,15 +64,23 @@ get_pantry <- function(schema=NULL, pantry_config="~/.pantry_config"){
 #' Create a schema in the pantry
 #' @export
 create_schema <- function(pantry, schema_name){
-	a <- pantry$con %>%
-		DBI::dbGetQuery(paste0("CREATE SCHEMA ", schema_name %>% dplyr::sql(), ";"))
+	con <- dplyr::con_acquire(pantry)
+	tryCatch({
+		a <- DBI::dbGetQuery(con, paste0("CREATE SCHEMA ", schema_name %>% dplyr::sql(), ";"))
+	}, finally = {
+		dplyr::con_release(pantry, con)
+	})
 }
 
 #' Drop a schema from the pantry
 #' @export
 drop_schema <- function(pantry, schema_name){
-	a <- pantry$con %>%
-		DBI::dbGetQuery(paste0("DROP SCHEMA ", schema_name %>% dplyr::sql(), " CASCADE;"))
+	con <- dplyr::con_acquire(pantry)
+	tryCatch({
+		a <- DBI::dbGetQuery(con, paste0("DROP SCHEMA ", schema_name %>% dplyr::sql(), " CASCADE;"))
+	}, finally = {
+		dplyr::con_release(pantry, con)
+	})
 }
 
 #' Set a schema as the active schema
@@ -83,15 +91,26 @@ set_schema <- function(pantry, schema_name){
 	} else {
 		search_path <- paste("\"$user\"", schema_name, "public", sep=",")
 	}
-	a <- pantry$con %>%
-		DBI::dbGetQuery(paste0("SET search_path TO ", search_path, ";"))
+
+	con <- dplyr::con_acquire(pantry)
+	tryCatch({
+		DBI::dbGetQuery(con, paste0("SET search_path TO ", search_path, ";"))
+	}, finally = {
+		dplyr::con_release(pantry, con)
+	})
 }
 
 #' Get the search path for looking for namespaces
 #' @export
 get_search_path <- function(pantry){
-	a <- pantry$con %>% DBI::dbGetQuery("SHOW search_path")
-	stringr::str_split(a$search_path, ", ")[[1]]
+	con <- dplyr::con_acquire(pantry)
+	tryCatch({
+		a <- DBI::dbGetQuery(con, "SHOW search_path")
+		search_path <- stringr::str_split(a$search_path, ", ")[[1]]
+	}, finally = {
+		dplyr::con_release(pantry, con)
+	})
+	search_path
 }
 
 #' Get all available schemas
@@ -102,29 +121,40 @@ get_schemas <- function(pantry, verbose=T){
 	}
 	pantry %>%
 		dplyr::tbl(dplyr::build_sql("SELECT schema_name FROM information_schema.schemata")) %>%
-		dplyr::collect %>%
+		dplyr::collect() %>%
 		data.frame
 }
 
 #' Get all tables in the active schema or search path
 #' @export
 get_tables <- function(pantry, all_tables=FALSE){
-	tables <- DBI::dbGetQuery(pantry$con, paste0(
-		"SELECT schemaname, tablename FROM pg_tables ",
-		"WHERE schemaname != 'information_schema' AND schemaname !='pg_catalog'"))
-	schema <- BioChemPantry::get_search_path(pantry)
-	if(!all_tables){
-		if(length(schema) > 0){
-			tables <- tables[tables$schemaname %in% schema,]
+	con <- dplyr::con_acquire(pantry)
+	tryCatch({
+		tables <- DBI::dbGetQuery(pantry$con, paste0(
+			"SELECT schemaname, tablename FROM pg_tables ",
+			"WHERE schemaname != 'information_schema' AND schemaname !='pg_catalog'"))
+		schema <- BioChemPantry::get_search_path(pantry)
+		if(!all_tables){
+			if(length(schema) > 0){
+				tables <- tables[tables$schemaname %in% schema,]
+			}
 		}
-	}
+	}, finally = {
+		dplyr::con_release(pantry, con)
+	})
 	tables
 }
 
 #' Drop a table
 #' @export
 drop_table <- function(pantry, table){
-	x <- DBI::dbGetQuery(pantry$con, paste0("DROP TABLE ", table %>% sql, " CASCADE;"))
+	con <- dplyr::con_acquire(pantry)
+	tryCatch({
+		x <- DBI::dbGetQuery(con, paste0("DROP TABLE ", table %>% sql, " CASCADE;"))
+	}, finally = {
+		dplyr::con_release(pantry, con)
+	})
+	x
 }
 
 #' Identify a table qualified by a schema. This works around issue 244 in dplyr
@@ -137,11 +167,19 @@ schema_tbl <- function(pantry, schema_table){
 }
 
 #' this adds the fast argument working around a known problem in dplyr and DBI
+#' https://github.com/hadley/dplyr/blob/master/R/tbl-sql.r#L294
+#' 
 #' https://github.com/hadley/dplyr/issues/1471
 #' https://github.com/rstats-db/DBI/issues/62
+#' @export
 copy_to.src_postgres <- function(
-	dest, df, name = deparse(substitute(df)),
-	types = NULL, temporary = TRUE, indexes = NULL,
+	dest,
+	df,
+	name = deparse(substitute(df)),
+	types = NULL,
+	temporary = TRUE,
+	unique_indexes = NULL,
+	indexes = NULL,
 	analyze = TRUE,
 	fast=FALSE,
 	...
@@ -149,39 +187,42 @@ copy_to.src_postgres <- function(
 	assertthat::assert_that(is.data.frame(df), is.string(name), is.flag(temporary))
 	class(df) <- "data.frame" # avoid S4 dispatch problem in dbSendPreparedQuery
 
+	con <- dplyr::con_acquire(pantry)
+	tryCatch({
+		if (isTRUE(dplyr::db_has_table(con, name))) {
+			stop("Table ", name, " already exists.", call. = FALSE)
+		}
 
-	if (name %in% DBI::dbGetQuery(
-		dest$con,
-		"SELECT relname FROM pg_class WHERE relkind IN ('r', 'v') AND pg_table_is_visible(oid);")[,1]){
-		stop("Table ", name, " already exists.", call. = FALSE)
-	}
+		types <- types %||% dplyr::db_data_type(con, df)
+		names(types) <- names(df)
 
-	types <- if(is.null(types)) dplyr::db_data_type(dest$con, df) else types
-	names(types) <- names(df)
+		dplyr::db_begin(con)
+		tryCatch({
+			dplyr::db_create_table(con, name, types, temporary = temporary)
 
-	con <- dest$con
-	dplyr::db_begin(con)
-	on.exit(dplyr::db_rollback(con))
+			if(fast){
+				#http://james.hiebert.name/blog/work/2011/10/24/RPostgreSQL-and-COPY-IN/
+				#warning this doesn't report any errors on failure!
+				field_names <- dplyr::escape(dplyr::ident(names(types)), collapse = NULL, con = con)
+				fields <- dplyr:::sql_vector(field_names, parens = TRUE, collapse = ", ", con = con)
+				sql <- dplyr::build_sql(
+					"COPY ", dplyr::ident(name), " ", fields, " FROM STDIN;", con=con)
+				DBI::dbSendQuery(con, sql)
+				RPostgreSQL::postgresqlCopyInDataframe(con, df)
+			} else {
+				dplyr::db_insert_into(con, name, df)
+			}
 
-	dplyr::db_create_table(con, name, types, temporary = temporary)
-	if(fast){
-		#http://james.hiebert.name/blog/work/2011/10/24/RPostgreSQL-and-COPY-IN/
-		#warning this doesn't report any errors on failure!
-		field_names <- dplyr::escape(dplyr::ident(names(types)), collapse = NULL, con = con)
-		fields <- dplyr:::sql_vector(field_names, parens = TRUE, collapse = ", ", con = con)
-		sql <- dplyr::build_sql(
-			"COPY ", dplyr::ident(name), " ", fields, " FROM STDIN;",
-			con=con)
-	  DBI::dbSendQuery(con, sql)
-		RPostgreSQL::postgresqlCopyInDataframe(con, df)
-	} else {
-		dplyr::db_insert_into(con, name, df)
-	}
-	dplyr:::db_create_indexes(con, name, indexes)
-	if (analyze) dplyr::db_analyze(con, name)
+			dplyr:::db_create_indexes(con, name, unique_indexes, unique = TRUE)
+			dplyr:::db_create_indexes(con, name, indexes, unique = FALSE)
 
-	dplyr::db_commit(con)
-	on.exit(NULL)
+			if (analyze) dplyr::db_analyze(con, name)
+		}, error = function(err){
+			dplyr::db_rollback(con)
+		})
+	}, finally = {
+		dplyr::con_release(pantry, con)
+	})
 
 	dplyr::tbl(dest, name)
 }
