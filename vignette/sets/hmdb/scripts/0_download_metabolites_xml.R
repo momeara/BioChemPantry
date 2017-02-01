@@ -3,7 +3,11 @@
 
 
 library(curl)
+library(BioChemPantry)
+
+staging_directory <- BioChemPantry::get_staging_directory("hmdb")
+
 
 curl::curl_download(
 	"http://www.hmdb.ca/system/downloads/current/hmdb_metabolites.zip",
-	paste0("data/hmdb_metabolites.zip")
+	paste0(staging_directory, "/data/hmdb_metabolites.zip"))

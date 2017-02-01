@@ -23,7 +23,7 @@ get_pantry_config <- function(pantry_config="~/.pantry_config"){
 #' @param pantry_config see get_pantry_config
 #' @return '<pantry_config$staging_dir>/<data_set>', creating the directory if necessary
 #' @export
-get_staging_directory <- function(data_set, pantry_config="~/.pantry/config"){
+get_staging_directory <- function(data_set, pantry_config="~/.pantry_config"){
 	pantry_config <- BioChemPantry::get_pantry_config(pantry_config)
 	staging_directory <- paste0(pantry_config$staging_directory, "/", data_set)
 	if(!file.exists(staging_directory)){
