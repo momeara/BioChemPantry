@@ -168,7 +168,7 @@ schema_tbl <- function(pantry, schema_table){
 
 #' this adds the fast argument working around a known problem in dplyr and DBI
 #' https://github.com/hadley/dplyr/blob/master/R/tbl-sql.r#L294
-#' 
+#'
 #' https://github.com/hadley/dplyr/issues/1471
 #' https://github.com/rstats-db/DBI/issues/62
 #' @export
@@ -184,7 +184,10 @@ copy_to.src_postgres <- function(
 	fast=FALSE,
 	...
 ) {
-	assertthat::assert_that(is.data.frame(df), is.string(name), is.flag(temporary))
+	assertthat::assert_that(
+		assertthat::is.data.frame(df),
+		assertthat::is.string(name),
+		assertthat::is.flag(temporary))
 	class(df) <- "data.frame" # avoid S4 dispatch problem in dbSendPreparedQuery
 
 	con <- dplyr::con_acquire(pantry)

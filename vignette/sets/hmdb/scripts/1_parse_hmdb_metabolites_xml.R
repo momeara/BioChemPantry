@@ -1,60 +1,95 @@
 # -*- tab-width:2;indent-tabs-mode:t;show-trailing-whitespace:t;rm-trailing-spaces:t -*-
 # vi: set ts=2 noet:
 
-require(data.table)
-require(plyr)
+library(plyr)
 library(dplyr)
-require(stringr)
-require(sqldf)
-
-
-library(XML)
+library(stringr)
+library(readr)
+library(purrr)
+library(xml2)
+library(BioChemPantry)
 
 #####################################
 # Analysis parameters
 
-staging_directory <- get_staging_directory("hmdb")
+staging_directory <- BioChemPantry::get_staging_directory("hmdb")
 
 # input paths
-hmdb_metabolites_xml_paths <- paste0(
-	staging_directory, "/data/hmdb_metabolites_xml/",
-	list.files(paste0(staging_directory, "/data/hmdb_metabolites_xml", "HMDB[0-9]+.xml")))
-
-hmdb_metabolite_activities_fname <- paste0(
-	staging_directory, "/data/hmdb_metabolite_activities_140908.csv")
-####################################
-# prepare primary data
+hmdb_metabolites_xml <- paste0(staging_directory, "/dump/hmdb_metabolites_tmp.xml") %>%
+	xml2::read_xml()
 
 
-xmlChild <- function(xml, name){
-	child_index <- which(sapply(xmlChildren(xml), xmlName) == name)
-	xmlChildren(xml)[[child_index]]
+xml_child_by_name <- function(xml, name){
+	child_index <- xml %>%
+		xml2::xml_children() %>%
+		xml2::xml_name() %>%
+		magrittr::equals(name) %>%
+		which
+	if(length(child_index) == 0) return(NA)
+	xml %>%
+		xml2::xml_children() %>%
+		magrittr::extract2(child_index)
 }
 
+m_data <- hmdb_metabolites_xml %>%
+	xml2::xml_children() %>%
+	plyr::ldply(function(metabolite){
+		get_value <- function(name){
+			node <- metabolite %>% xml_child_by_name(name)
+			if(is.na(node)) return(NA)
+			contents <- node %>% xml2::xml_contents()
+			if(length(contents) == 0) return(NA)
+			contents %>% as.character
+		}
+		get_taxon <- function(level){
+			taxonomy <- metabolite %>% xml_child_by_name("taxonomy")
+			if(is.na(taxonomy)) return(NA)
+			node <- taxonomy %>% xml_child_by_name(level)
+			if(is.na(node)) return(NA)
+			contents <- node %>% xml2::xml_contents()
+			if(length(contents) == 0) return(NA)
+			contents %>% as.character
+		}
+		ontology_status <- function(){
+			ontology_node <- metabolite %>% xml_child_by_name("ontology")
+			if(is.na(ontology_node)) return(NA)
+			status <- ontology_node %>% xml_child_by_name("status")
+			if(is.na(status)) return(NA)
+			contents <- status %>% xml2::xml_contents()
+			if(length(contents) == 0) return(NA)
+			contents %>% as.character
+		}
+		from_origin <- function(source){
+			ontology_node <- metabolite %>% xml_child_by_name("ontology")
+			if(is.na(ontology_node)) return(NA)
+			origins_nodeset <- ontology_node %>% xml_child_by_name("origins")
+			if(is.na(origins_nodeset) || length(origins_nodeset) == 0) return(NA)
+			origins <- origins_nodeset %>% xml2::as_list() %>% purrr::flatten
+			source %in% origins
+		}
+		tibble::data_frame(
+			accession = get_value("accession"),
+			name = get_value("name"),
+			smiles = get_value("smiles"),
+			description = get_value("description"),
+			taxonomy_description = get_taxon("description"),
+			taxonomy_kingdom = get_taxon("kingdom"),
+			taxonomy_super_class = get_taxon("super_class"),
+			taxonomy_class = get_taxon("class"),
+			taxonomy_sub_class = get_taxon("sub_class"),
+			taxonomy_molecular_framework = get_taxon("molecular_framework"),
+			ontology_status = ontology_status(),
+			origin_food = from_origin("Food"),
+			origin_endogenous = from_origin("Endogenous"),
+			origin_microbial = from_origin("Microbial"),
+			origin_drug = from_origin("Drug"),
+			origin_drug_or_steroid_metabolite = from_origin("Drug or Steroid Metabolite"),
+			origin_drug_metabolite = from_origin("Drug Metabolite"),
+			origin_plant = from_origin("Plant"),
+			origin_toxin_pollutant = from_origin("Toxin/Pollutant"),
+			origin_cosmetic = from_origin("Cosmetic"))
+	})
 
+dir.create(paste0(staging_directory, "/data"))
+m_data %>% readr::write_tsv(paste0(staging_directory, "/data/metabolites.tsv"))
 
-# this takes an hour or so
-activities <- hmdb_metabolites_xml_paths %>% lapply(function(xml_path){
-	t <- xmlInternalTreeParse(xml_path, getDTD=F) %>% xmlChild("metabolite")
-	metabolite_accession <- xmlValue( t %>% xmlChild("accession") )
-
-	targets <- t %>% xmlChild("protein_associations")
-	if(is.null(xmlChildren(targets)$protein)){
-		return( data.frame() )
-	} else {
-		ldply(.data=targets %>% xmlChildren, .fun=function(target) {
-			data.frame(
-				metabolite_accession = metabolite_accession,
-				hmdb_protein_accession = target %>%
-					xmlChild("protein_accession") %>% xmlValue,
-				uniprot_id = target %>%
-					xmlChild("uniprot_id") %>% xmlValue,
-				protein_name = target %>%
-					xmlChild("name") %>% xmlValue)
-		}) %>% select(-.id)
-	}
-})
-activities_tbl <- activities %>% rbind_all
-
-activities_tbl %>% write.table(
-		hmdb_metabolite_activities_fname, row.names=F, sep="\t")
