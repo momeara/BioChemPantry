@@ -185,9 +185,9 @@ copy_to.src_postgres <- function(
 	...
 ) {
 	assertthat::assert_that(
-		assertthat::is.data.frame(df),
-		assertthat::is.string(name),
-		assertthat::is.flag(temporary))
+		is.data.frame(df),
+		is.string(name),
+		is.flag(temporary))
 	class(df) <- "data.frame" # avoid S4 dispatch problem in dbSendPreparedQuery
 
 	con <- dplyr::con_acquire(pantry)
@@ -196,7 +196,7 @@ copy_to.src_postgres <- function(
 			stop("Table ", name, " already exists.", call. = FALSE)
 		}
 
-		types <- types %||% dplyr::db_data_type(con, df)
+		types <- if(is.null(types)) dplyr::db_data_type(con, df) else types
 		names(types) <- names(df)
 
 		dplyr::db_begin(con)
@@ -220,6 +220,7 @@ copy_to.src_postgres <- function(
 			dplyr:::db_create_indexes(con, name, indexes, unique = FALSE)
 
 			if (analyze) dplyr::db_analyze(con, name)
+			dplyr::db_commit(con)
 		}, error = function(err){
 			dplyr::db_rollback(con)
 		})
