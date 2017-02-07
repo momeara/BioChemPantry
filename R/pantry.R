@@ -130,7 +130,7 @@ get_schemas <- function(pantry, verbose=T){
 get_tables <- function(pantry, all_tables=FALSE){
 	con <- dplyr::con_acquire(pantry)
 	tryCatch({
-		tables <- DBI::dbGetQuery(pantry$con, paste0(
+		tables <- DBI::dbGetQuery(con, paste0(
 			"SELECT schemaname, tablename FROM pg_tables ",
 			"WHERE schemaname != 'information_schema' AND schemaname !='pg_catalog'"))
 		schema <- BioChemPantry::get_search_path(pantry)
