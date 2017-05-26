@@ -15,6 +15,7 @@ Imports:
     assertr,
     plyr,
     dplyr,
+    dbplyr,
     magrittr,
     jsonlite,
     stringr,
