@@ -94,6 +94,12 @@ get_search_path <- function(pantry){
 	stringr::str_split(a$search_path, ", ")[[1]]
 }
 
+#' Alias for get_search_path
+#' @export
+get_schema <- function(pantry){
+	get_search_path(pantry)
+}
+
 #' Get all available schemas
 #' @export
 get_schemas <- function(pantry, verbose=T){
