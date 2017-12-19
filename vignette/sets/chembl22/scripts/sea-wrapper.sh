@@ -19,20 +19,18 @@
 ###  
 ###   To submit job
 ###     cd <run_base>/logs
-###     qsub -t 1-<n_targets> ../sea-wrapper.sh <run_base> <library_fname> <fp_type>
+###     qsub -t 1-<n_targets> ../sea-wrapper.sh <run_base> <library_fname>
 ###     
 
 
-shopt -s nullglob
+
 set -e
 
 PERSIST=$1
-SEA_CONFIG_FILES=($PERSIST/*.cfg)
 
 LIB_FULL=$2
 LIB=$(basename $LIB_FULL)
 
-FP_TYPE=$3
 
 INPUT_FILES=$PERSIST/inputs
 COMPLETE=$PERSIST/outputs
@@ -47,37 +45,25 @@ fi
 
 TASK_DIR=$SCRATCH_DIR/$( whoami )/$JOB_ID/$TASK_NAME
 
-cmd="SeaShell.py \
+echo "SGE_TASK_ID:" $SGE_TASK_ID 1>&2
+echo "Source file:" $TASK_FILE 1>&2
+echo "Run dir:" $( hostname ):$TASK_DIR 1>&2
+echo "SEA library:" $LIB_FULL 1>&2
+
+source /mnt/nfs/work/momeara/seaware/env/bin/activate
+
+mkdir -pv $TASK_DIR 1>&2
+pushd $TASK_DIR 1>&2
+
+cp $LIB_FULL . 
+SeaShell.py \
     batch \
     --library $LIB \
     --disable-precache \
     --skip-standardization \
     --target-name $TASK_NAME \
-    --generate-fingerprint $FP_TYPE \
     $TASK_FILE \
-    $TASK_INPUT.out.csv 1>&2"
-
-
-echo "SGE_TASK_ID:" $SGE_TASK_ID 1>&2
-echo "Source file:" $TASK_FILE 1>&2
-echo "Run dir:" $( hostname ):$TASK_DIR 1>&2
-echo "SEA library:" $LIB_FULL 1>&2
-echo "fingerprint type:" $FP_TYPE 1>&2
-echo "config_files:" $SEA_CONFIG_FILES 1>&2
-echo "cmd:" $cmd 1>&2
-
-source /nfs/work/momeara/tools/anaconda2/envs/sea16/bin/activate sea16
-
-mkdir -pv $TASK_DIR 1>&2
-pushd $TASK_DIR 1>&2
-
-cp $LIB_FULL .
-
-for $SEA_CONFIG_FILE in $SEA_CONFIG_FILES; do
-    cp $SEA_CONFIG_FILE .
-done
-
-eval $cmd
+    $TASK_INPUT.out.csv 1>&2
 /bin/rm -f $LIB*
 
 popd

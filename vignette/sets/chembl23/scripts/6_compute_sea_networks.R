@@ -8,8 +8,12 @@ library(fdrtool)
 library(BioChemPantry)
 library(SEAR)
 
-staging_directory <- get_staging_directory("chembl21")
+staging_directory <- get_staging_directory("chembl23")
 
+runs_dir <- paste0(staging_directory, "/data/runs")
+if(!dir.exists(runs_dir)){
+	dir.create(runs_dir)
+}
 
 target_info <- readr::read_tsv(
 	paste0(staging_directory, "/data/target_info.tsv"),
@@ -41,7 +45,7 @@ submit_compute_sea_network <- function(
 			by=c("compound"))
 
 	run_base <- paste0(
-		staging_directory, "/data/runs/",
+		runs_dir, "/",
 		library_id, "_vs_", library_id)
 	unlink(run_base, recursive=T, force=T)
 	dir.create(run_base)
@@ -146,6 +150,7 @@ collect_compute_sea_network <- function(
 					`Target ID` = col_character(),
 					`Affinity Threshold (nM)` = col_integer(),
 					`P-Value` = col_double(),
+					`Cut Sum` = col_double(),
 					`Max Tc` = col_double(),
 					`Z-Score` = col_double(),
 					Name = col_character(),
@@ -155,6 +160,7 @@ collect_compute_sea_network <- function(
 					target2 = `Query ID`,
 					affinity = `Affinity Threshold (nM)`,
 					Pvalue = `P-Value`,
+					CutSum = `Cut Sum`,
 					MaxTC = `Max Tc`,
 					Zscore = `Z-Score`)
 		})
@@ -168,7 +174,7 @@ collect_compute_sea_network <- function(
 		dplyr::mutate(
 			Pvalue = ifelse(is.na(Pvalue), runif(n()), Pvalue))
 
-	a <- fdrtool(fdr$Pvalue, statistic="pvalue")
+	a <- fdrtool::fdrtool(fdr$Pvalue, statistic="pvalue")
 	fdr <- fdr %>%
 		dplyr::mutate(
 			Qvalue=a$qval,
@@ -180,7 +186,7 @@ collect_compute_sea_network <- function(
 		left_join(fdr, by=c("target1", "target2"))
 
 	scores <- scores %>%
-		left_join(
+		dplyr::left_join(
 			target_info %>%
 				dplyr::select(
 					target1 = uniprot_entry,
@@ -194,7 +200,7 @@ collect_compute_sea_network <- function(
 					target1_class_5 = class_5,
 					target1_class_6 = class_6),
 			by=c("target1")) %>%
-		left_join(
+		dplyr::left_join(
 			target_info %>%
 				dplyr::select(
 					target2 = uniprot_entry,
@@ -231,17 +237,36 @@ collect_compute_sea_network <- function(
 			target2_class_4,
 			target2_class_5,
 			target2_class_6,
+			CutSum,
 			Zscore,
 			Pvalue,
 			Evalue)
 
 	scores_fname <- paste0(staging_directory, "/data/", library_id, ".scores.csv")
-	scores %>% write_csv(scores_fname)
-	scores
+	scores %>% readr::write_csv(scores_fname)
+	s <- scores
 }
 
+
+
+#######
 run_base <- submit_compute_sea_network(
-	library_id="chembl21_ECFC6",
+	library_id="chembl23_rdkit_ecfp4",
+	target_range='all',
+	fp_type='rdkit_ecfp',
+	config_files=list(fpcore="[rdkit_ecfp]\ncircle_radius=2\n"),
+	verbose=TRUE,
+	dry_run=TRUE)
+
+scores <- collect_compute_sea_network(
+	staging_directory=staging_directory,
+	library_id="chembl23_rdkit_ecfp4",
+	run_base=run_base,
+	target_info=target_info)
+
+##############
+run_base <- submit_compute_sea_network(
+	library_id="chembl23_ECFC6",
 	target_range='all',
 	fp_type='rdkit_ecfc',
 	config_files=list(fpcore="[rdkit_ecfc]\ncircle_radius=3\n"),
@@ -250,14 +275,16 @@ run_base <- submit_compute_sea_network(
 
 collect_compute_sea_network(
 	staging_directory=staging_directory,
-	library_id="chembl21_ECFC6",
+	library_id="chembl23_ECFC6",
 	run_base=run_base,
 	target_info=target_info)
 
 
+
+
 #######
 run_base <- submit_compute_sea_network(
-	library_id="chembl21_APDP",
+	library_id="chembl23_APDP",
 	target_range='all',
 	fp_type='rdkit_apdp',
 	config_files=NULL,
@@ -266,7 +293,7 @@ run_base <- submit_compute_sea_network(
 
 collect_compute_sea_network(
 	staging_directory=staging_directory,
-	library_id="chembl21_ECFC6",
+	library_id="chembl23_ECFC6",
 	run_base=run_base,
 	target_info=target_info)
 

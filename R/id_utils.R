@@ -205,9 +205,10 @@ summarize_map <- function(data, xcols, ycols, n_examples=4, verbose=F){
 	ex_rows <- data %>% dplyr:::select_(.dots=xcols) %>% complete.cases %>% magrittr::not() %>% which
 	if(length(ex_rows)){
 		if(!is.null(n_examples) && (n_examples < length(ex_rows))){
-			ex_rows <- ex_rows %>% dplyr::sample_n(n_examples, replace=FALSE)
+			ex_rows <- ex_rows %>% tibble::data_frame %>% dplyr::sample_n(n_examples, replace=FALSE)
 		}
 		problems$is.na.X <- data[ex_rows,] %>%
+				tibble::data_frame %>%
 				dplyr::arrange_(.dots=xcols)
 	}
 
@@ -215,9 +216,10 @@ summarize_map <- function(data, xcols, ycols, n_examples=4, verbose=F){
 	ex_rows <- data %>% dplyr:::select_(.dots=ycols) %>% complete.cases %>% magrittr::not() %>% which
 	if(length(ex_rows)){
 		if(!is.null(n_examples) && (n_examples < length(ex_rows))){
-			ex_rows <- ex_rows %>% dplyr::sample_n(n_examples, replace=FALSE)
+			ex_rows <- ex_rows %>% tibble::data_frame %>% dplyr::sample_n(n_examples, replace=FALSE)
 		}
 		problems$is.na.Y <- data[ex_rows,] %>%
+				tibble::data_frame %>%
 				dplyr::arrange_(.dots=ycols)
 	}
 

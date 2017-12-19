@@ -23,7 +23,7 @@ get_pantry_config <- function(pantry_config="~/.pantry_config"){
 #' @param pantry_config see get_pantry_config
 #' @return '<pantry_config$staging_dir>/<data_set>', creating the directory if necessary
 #' @export
-get_staging_directory <- function(data_set, pantry_config="~/.pantry_config"){
+get_staging_directory <- function(data_set, pantry_config="~/.pantry_config", verbose=TRUE){
 	pantry_config <- BioChemPantry::get_pantry_config(pantry_config)
 	staging_directory <- paste0(pantry_config$staging_directory, "/", data_set)
 	if(!file.exists(staging_directory)){
@@ -32,6 +32,9 @@ get_staging_directory <- function(data_set, pantry_config="~/.pantry_config"){
 		}, error=function(e){
 			stop(paste0("Unable to get staging area for dataset '", data_set, "': '", staging_directory, "'."))
 		})
+	}
+	if(verbose){
+		cat("Staging directory: ", staging_directory, "\n")
 	}
 	staging_directory
 }
@@ -77,14 +80,22 @@ drop_schema <- function(pantry, schema_name){
 
 #' Set a schema as the active schema
 #' @export
-set_schema <- function(pantry, schema_name){
-	if(is.null(schema_name)){
-		search_path <- paste("\"$user\"", "public", sep=",")
-	} else {
-		search_path <- paste("\"$user\"", schema_name, "public", sep=",")
+set_schema <- function(pantry, schema_name, include_temp=TRUE){
+	search_path <- c("\"$user\"")
+	if(include_temp){
+			# https://www.postgresql.org/message-id/il7g0n%24r4j%241%40dough.gmane.org
+			temp_namespace <- pantry$con %>%
+				DBI::dbGetQuery("SELECT nspname FROM pg_namespace WHERE oid = pg_my_temp_schema();")
+			search_path <- c(search_path, temp_namespace)
 	}
+	if(!is.null(schema_name)){
+		search_path <- c(search_path, schema_name)
+	}
+	search_path <- c(search_path, "public")
 
-	DBI::dbGetQuery(pantry$con, paste0("SET search_path TO ", search_path, ";"))
+	search_path <- paste(search_path, collapse=",")
+
+	ret <- pantry$con %>% DBI::dbGetQuery(paste0("SET search_path TO ", search_path, ";"))
 }
 
 #' Get the search path for looking for namespaces
@@ -108,6 +119,7 @@ get_schemas <- function(pantry, verbose=T){
 	}
 	pantry %>%
 		dplyr::tbl(dbplyr::build_sql("SELECT schema_name FROM information_schema.schemata")) %>%
+		dplyr::arrange(schema_name) %>%
 		dplyr::collect() %>%
 		data.frame
 }
@@ -142,61 +154,61 @@ schema_tbl <- function(pantry, schema_table){
 		dplyr::tbl(structure(paste0("SELECT * FROM ",  schema_table), class=c("sql", "character")))
 }
 
-# #' this adds the fast argument working around a known problem in dplyr and DBI
-# #' https://github.com/hadley/dplyr/blob/master/R/tbl-sql.r#L294
-# #'
-# #' https://github.com/hadley/dplyr/issues/1471
-# #' https://github.com/rstats-db/DBI/issues/62
-# #' @export
-# copy_to.src_postgres <- function(
-# 	dest,
-# 	df,
-# 	name = deparse(substitute(df)),
-# 	types = NULL,
-# 	temporary = TRUE,
-# 	unique_indexes = NULL,
-# 	indexes = NULL,
-# 	analyze = TRUE,
-# 	fast=FALSE,
-# 	...
-# ) {
-# 	assertthat::assert_that(
-# 		is.data.frame(df),
-# 		is.string(name),
-# 		is.flag(temporary))
-# 	class(df) <- "data.frame" # avoid S4 dispatch problem in dbSendPreparedQuery
-# 
-# 	if (isTRUE(dplyr::db_has_table(pantry$con, name))) {
-# 		stop("Table ", name, " already exists.", call. = FALSE)
-# 	}
-# 
-# 	types <- if(is.null(types)) dplyr::db_data_type(pantry$con, df) else types
-# 	names(types) <- names(df)
-# 
-# 	dplyr::db_begin(pantry$con)
-# 	tryCatch({
-# 		dplyr::db_create_table(pantry$con, name, types, temporary = temporary)
-# 
-# 		if(fast){
-# 			#http://james.hiebert.name/blog/work/2011/10/24/RPostgreSQL-and-COPY-IN/
-# 			#warning this doesn't report any errors on failure!
-# 			field_names <- dplyr::escape(dplyr::ident(names(types)), collapse = NULL, con = pantry$con)
-# 			fields <- dplyr:::sql_vector(field_names, parens = TRUE, collapse = ", ", con = pantry$con)
-# 			sql <- dbplyr::build_sql(
-# 				"COPY ", dplyr::ident(name), " ", fields, " FROM STDIN;", con=pantry$con)
-# 			DBI::dbSendQuery(pantry$con, sql)
-# 			RPostgreSQL::postgresqlCopyInDataframe(con, df)
-# 		} else {
-# 			dplyr::db_insert_into(pantry$con, name, df)
-# 		}
-# 
-# 		dplyr:::db_create_indexes(pantry$con, name, unique_indexes, unique = TRUE)
-# 		dplyr:::db_create_indexes(pantry$con, name, indexes, unique = FALSE)
-# 
-# 		if (analyze) dplyr::db_analyze(pantry$con, name)
-# 		dplyr::db_commit(pantry$con)
-# 	}, error = function(err){
-# 		dplyr::db_rollback(pantry$con)
-# 	})
-# 	dplyr::tbl(dest, name)
-# }
+#' this adds the fast argument working around a known problem in dplyr and DBI
+#' https://github.com/hadley/dplyr/blob/master/R/tbl-sql.r#L294
+#'
+#' https://github.com/hadley/dplyr/issues/1471
+#' https://github.com/rstats-db/DBI/issues/62
+#' @export
+copy_to.src_postgres <- function(
+	dest,
+	df,
+	name = deparse(substitute(df)),
+	types = NULL,
+	temporary = TRUE,
+	unique_indexes = NULL,
+	indexes = NULL,
+	analyze = TRUE,
+	fast=FALSE,
+	...
+) {
+	assertthat::assert_that(
+		is.data.frame(df),
+		is.string(name),
+		is.flag(temporary))
+	class(df) <- "data.frame" # avoid S4 dispatch problem in dbSendPreparedQuery
+
+	if (isTRUE(dplyr::db_has_table(pantry$con, name))) {
+		stop("Table ", name, " already exists.", call. = FALSE)
+	}
+
+	types <- if(is.null(types)) dplyr::db_data_type(pantry$con, df) else types
+	names(types) <- names(df)
+
+	dplyr::db_begin(pantry$con)
+	tryCatch({
+		dplyr::db_create_table(pantry$con, name, types, temporary = temporary)
+
+		if(fast){
+			#http://james.hiebert.name/blog/work/2011/10/24/RPostgreSQL-and-COPY-IN/
+			#warning this doesn't report any errors on failure!
+			field_names <- dplyr::escape(dplyr::ident(names(types)), collapse = NULL, con = pantry$con)
+			fields <- dplyr:::sql_vector(field_names, parens = TRUE, collapse = ", ", con = pantry$con)
+			sql <- dbplyr::build_sql(
+				"COPY ", dplyr::ident(name), " ", fields, " FROM STDIN;", con=pantry$con)
+			DBI::dbSendQuery(pantry$con, sql)
+			RPostgreSQL::postgresqlCopyInDataframe(con, df)
+		} else {
+			dplyr::db_insert_into(pantry$con, name, df)
+		}
+
+		dplyr:::db_create_indexes(pantry$con, name, unique_indexes, unique = TRUE)
+		dplyr:::db_create_indexes(pantry$con, name, indexes, unique = FALSE)
+
+		if (analyze) dplyr::db_analyze(pantry$con, name)
+		dplyr::db_commit(pantry$con)
+	}, error = function(err){
+		dplyr::db_rollback(pantry$con)
+	})
+	dplyr::tbl(dest, name)
+}

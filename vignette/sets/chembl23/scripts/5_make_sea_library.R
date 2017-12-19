@@ -7,12 +7,12 @@ library(readr)
 
 source("~/work/sea/scripts/sea.R")
 
-staging_directory <- get_staging_directory("chembl21")
+staging_directory <- get_staging_directory("chembl23")
 
 
 load(paste0(staging_directory, "/data/full_chembl_data.Rdata"))
 
-library_fname <-paste0(staging_directory, "/data/chembl21.sea")
+library_fname <-paste0(staging_directory, "/data/chembl23.sea")
 fingerprint_type <- "rdkit_ecfp"
 name <- "ChEMBL21_by_uniprot_entry_to_zinc_id"
 

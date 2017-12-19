@@ -4,17 +4,16 @@
 library(plyr)
 library(dplyr)
 library(readr)
+library(BioChemPantry)
 
 source("~/work/sea/scripts/sea.R")
 
 staging_directory <- get_staging_directory("chembl21")
-
-
 load(paste0(staging_directory, "/data/full_chembl_data.Rdata"))
 
-library_fname <-paste0(staging_directory, "/data/chembl21.sea")
-fingerprint_type <- "rdkit_ecfp"
-name <- "ChEMBL21_by_uniprot_entry_to_zinc_id"
+library_fname <-paste0(staging_directory, "/data/chembl21_ECFC6.sea")
+fingerprint_type <- "rdkit_ecfc"
+name <- "ChEMBL21_by_uniprot_entry_to_zinc_id_ECFC6"
 
 
 chembl_sets <- full_chembl_data %>%
@@ -24,7 +23,7 @@ chembl_sets <- full_chembl_data %>%
 		name=gene_name,
 		compound=zinc_id,
 		affinity=5,
-		description=target_description) %>%
+		description=description) %>%
 	mutate(
 		name=ifelse(name %>% is.na, "", name),
 		description=ifelse(description %>% is.na, "", description))
@@ -42,6 +41,7 @@ pack.library(
 	library_fname=library_fname,
 	fingerprint_type=fingerprint_type,
 	name=name,
+	config_files=list(fpcore="[rdkit_ecfc]\ncircle_radius=3\n"),
 	verbose=T)
 
 
@@ -52,7 +52,7 @@ missing_sets <- chembl_sets %>% anti_join(lib$targets, by=c("target", "compound"
 
 
 test_sets <- chembl_sets %>% filter(compound == "ZINC000169746649")
-write.set(test_sets, paste0("/scratch/momeara/test_set.set")
+write.set(test_sets, "/scratch/momeara/test_set.set")
 test_smi <- chembl_smi %>% filter(compound == "ZINC000169746649")
 write.smi(test_smi, "/scratch/momeara/test.csv")
 pack.library(
