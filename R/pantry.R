@@ -52,7 +52,10 @@ get_pantry <- function(schema=NULL, pantry_config="~/.pantry_config"){
 		schema <- tolower(schema)
 	}
 
-	pantry <- do.call(dplyr::src_postgres, pantry_config$login)
+	# this two step process is to allow DBI::dbConnect to pick the right specialized method
+	# while allowing arguments to be passed in as a list
+	get_pantry_from_login <- function(...){DBI::dbConnect(RPostgres::Postgres(), ...)}
+	pantry <- do.call(get_pantry_config_from_login, pantry_config$login)
 
 	if(!is.null(schema)){
 		schemas <- BioChemPantry::get_schemas(pantry)

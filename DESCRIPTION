@@ -16,6 +16,7 @@ Imports:
     plyr,
     dplyr,
     dbplyr,
+    RPostgres,
     magrittr,
     jsonlite,
     stringr,

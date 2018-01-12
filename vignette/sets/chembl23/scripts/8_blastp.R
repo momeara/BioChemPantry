@@ -4,12 +4,13 @@
 library(plyr)
 library(dplyr)
 library(Bethany)
+library(stringr)
 library(seqinr)
 library(BioChemPantry)
 
-pantry <- get_pantry("sea_chembl21")
-staging_directory <- get_staging_directory("chembl21")
-gencode_staging_directory <- get_staging_directory("gencode24")
+pantry <- get_pantry("sea_chembl23")
+staging_directory <- get_staging_directory("chembl23")
+gencode_staging_directory <- get_staging_directory("gencode27")
 
 chembl_target_sequences <- pantry %>%
 	dplyr::tbl("targets") %>%
@@ -26,7 +27,7 @@ names(chembl_sequences) = chembl_target_sequences$uniprot_entry
 scores <- Bethany::blastp(
 	ref=chembl_sequences,
 	query=chembl_sequences,
-	run_id="blastp_chembl21_vs_chembl21",
+	run_id="blastp_chembl23_vs_chembl23",
 	verbose=T) %>%
 	rename(
 		target1 = ref_target,
@@ -34,7 +35,7 @@ scores <- Bethany::blastp(
 	arrange(EValue) %>%
 	distinct(target1, target2, .keep_all=T)
 
-pantry %>% copy_to(
+pantry %>% dplyr::copy_to(
 	df=scores,
 	name="blastp_target_vs_target",
 	temporary=F,
@@ -47,14 +48,14 @@ pantry %>% copy_to(
 
 # compute target_vs_human blast scores
 scores_human <- blastp(
-	ref=paste0(gencode_staging_directory, "/dump/gencode.v24.pc_translations.fa"),
+	ref=paste0(gencode_staging_directory, "/dump/gencode.v27.pc_translations.fa"),
 	query=chembl_sequences,
-	run_id="blastp_chembl21_vs_gencode_v24_human",
+	run_id="blastp_chembl21_vs_gencode_v27_human",
 	verbose=T) %>%
 	rename(
 		chembl_target_uniprot_entry = ref_target,
 		gencode_ids = query_target)
-gencode_ids <- str_split_fixed(scores_human$gencode_ids, "[|]", 8)
+gencode_ids <- stringr::str_split_fixed(scores_human$gencode_ids, "[|]", 8)
 
 # work around for "incorrect number of dimensions" bug?
 b <- gencode_ids

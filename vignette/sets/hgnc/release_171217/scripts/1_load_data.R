@@ -134,3 +134,6 @@ pantry %>% dplyr::copy_to(
 		"symbol",
 		"uniprot_accn",
 		"uniprot_entry"))
+
+#############
+https://www.genenames.org/cgi-bin/genefamilies/download-all/json
