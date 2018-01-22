@@ -138,7 +138,7 @@ get_schemas <- function(pantry, verbose=T){
 
 #' Get all tables in the active schema or search path
 #' @export
-get_tables <- function(pantry all_tables=FALSE){
+get_tables <- function(pantry, all_tables=FALSE){
 	tables <- DBI::dbGetQuery(pantry, paste0(
 		"SELECT schemaname, tablename FROM pg_tables ",
 		"WHERE schemaname != 'information_schema' AND schemaname !='pg_catalog'"))
