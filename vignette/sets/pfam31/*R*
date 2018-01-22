@@ -1,0 +1,357 @@
+
+R version 3.4.1 (2017-06-30) -- "Single Candle"
+Copyright (C) 2017 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> > options(STERM='iESS', str.dendrogram.last="'", editor='emacsclient', show.error.locations=TRUE)
+> 
+> devtools::install_github("tidyverse/dplyr")
+Downloading GitHub repo tidyverse/dplyr@master
+from URL https://api.github.com/repos/tidyverse/dplyr/zipball/master
+Installing dplyr
+trying URL 'https://cran.rstudio.com/src/contrib/rlang_0.1.6.tar.gz'
+Content type 'application/x-gzip' length 202290 bytes (197 KB)
+==================================================
+downloaded 197 KB
+
+Installing rlang
+'/mnt/nfs/home/momeara/opt/lib64/R/bin/R' --no-site-file --no-environ  \
+  --no-save --no-restore --quiet CMD INSTALL  \
+  '/tmp/Rtmp4hQ74r/devtools6dbe7e83139d/rlang'  \
+  --library='/mnt/nfs/home/momeara/opt/lib64/R/library' --install-tests 
+
+* installing *source* package ‘rlang’ ...
+** package ‘rlang’ successfully unpacked and MD5 sums checked
+** libs
+gcc -std=gnu99 -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG   -I/usr/local/include   -fpic  -I/mnt/nfs/home/momeara/opt/include   -c attrs.c -o attrs.o
+gcc -std=gnu99 -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG   -I/usr/local/include   -fpic  -I/mnt/nfs/home/momeara/opt/include   -c capture.c -o capture.o
+gcc -std=gnu99 -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG   -I/usr/local/include   -fpic  -I/mnt/nfs/home/momeara/opt/include   -c env.c -o env.o
+gcc -std=gnu99 -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG   -I/usr/local/include   -fpic  -I/mnt/nfs/home/momeara/opt/include   -c eval.c -o eval.o
+gcc -std=gnu99 -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG   -I/usr/local/include   -fpic  -I/mnt/nfs/home/momeara/opt/include   -c export.c -o export.o
+gcc -std=gnu99 -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG   -I/usr/local/include   -fpic  -I/mnt/nfs/home/momeara/opt/include   -c formula.c -o formula.o
+gcc -std=gnu99 -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG   -I/usr/local/include   -fpic  -I/mnt/nfs/home/momeara/opt/include   -c init.c -o init.o
+gcc -std=gnu99 -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG   -I/usr/local/include   -fpic  -I/mnt/nfs/home/momeara/opt/include   -c lang.c -o lang.o
+gcc -std=gnu99 -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG   -I/usr/local/include   -fpic  -I/mnt/nfs/home/momeara/opt/include   -c pairlist.c -o pairlist.o
+gcc -std=gnu99 -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG   -I/usr/local/include   -fpic  -I/mnt/nfs/home/momeara/opt/include   -c replace-na.c -o replace-na.o
+gcc -std=gnu99 -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG   -I/usr/local/include   -fpic  -I/mnt/nfs/home/momeara/opt/include   -c sexp.c -o sexp.o
+gcc -std=gnu99 -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG   -I/usr/local/include   -fpic  -I/mnt/nfs/home/momeara/opt/include   -c splice.c -o splice.o
+gcc -std=gnu99 -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG   -I/usr/local/include   -fpic  -I/mnt/nfs/home/momeara/opt/include   -c symbol.c -o symbol.o
+gcc -std=gnu99 -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG   -I/usr/local/include   -fpic  -I/mnt/nfs/home/momeara/opt/include   -c unquote.c -o unquote.o
+gcc -std=gnu99 -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG   -I/usr/local/include   -fpic  -I/mnt/nfs/home/momeara/opt/include   -c utils.c -o utils.o
+gcc -std=gnu99 -shared -L/mnt/nfs/home/momeara/opt/lib -L/mnt/nfs/home/momeara/opt/lib64 -o rlang.so attrs.o capture.o env.o eval.o export.o formula.o init.o lang.o pairlist.o replace-na.o sexp.o splice.o symbol.o unquote.o utils.o
+/mnt/nfs/home/momeara/opt/bin/ld: skipping incompatible /mnt/nfs/home/momeara/opt/lib/libgcc_s.so when searching for -lgcc_s
+/mnt/nfs/home/momeara/opt/bin/ld: skipping incompatible /mnt/nfs/home/momeara/opt/lib/libgcc_s.so when searching for -lgcc_s
+installing to /mnt/nfs/home/momeara/opt/lib64/R/library/rlang/libs
+** R
+** inst
+** tests
+** preparing package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded
+* DONE (rlang)
+'/mnt/nfs/home/momeara/opt/lib64/R/bin/R' --no-site-file --no-environ  \
+  --no-save --no-restore --quiet CMD INSTALL  \
+  '/tmp/Rtmp4hQ74r/devtools6dbe1c698108/tidyverse-dplyr-e4b34cd'  \
+  --library='/mnt/nfs/home/momeara/opt/lib64/R/library' --install-tests 
+
+* installing *source* package ‘dplyr’ ...
+** libs
+g++  -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG -I../inst/include -DCOMPILING_DPLYR -DBOOST_NO_INT64_T -DBOOST_NO_INTEGRAL_INT64_T -DBOOST_NO_LONG_LONG -DRCPP_USING_UTF8_ERROR_STRING -I"/mnt/nfs/home/momeara/opt/lib64/R/library/Rcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/BH/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/bindrcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/plogr/include" -I/usr/local/include   -fpic  -O3 -mtune=native -march=native -Wno-unused-variable -Wno-unused-function -flto -ffat-lto-objects  -Wno-unused-local-typedefs -Wno-ignored-attributes -Wno-deprecated-declarations -c RcppExports.cpp -o RcppExports.o
+g++  -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG -I../inst/include -DCOMPILING_DPLYR -DBOOST_NO_INT64_T -DBOOST_NO_INTEGRAL_INT64_T -DBOOST_NO_LONG_LONG -DRCPP_USING_UTF8_ERROR_STRING -I"/mnt/nfs/home/momeara/opt/lib64/R/library/Rcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/BH/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/bindrcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/plogr/include" -I/usr/local/include   -fpic  -O3 -mtune=native -march=native -Wno-unused-variable -Wno-unused-function -flto -ffat-lto-objects  -Wno-unused-local-typedefs -Wno-ignored-attributes -Wno-deprecated-declarations -c address.cpp -o address.o
+g++  -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG -I../inst/include -DCOMPILING_DPLYR -DBOOST_NO_INT64_T -DBOOST_NO_INTEGRAL_INT64_T -DBOOST_NO_LONG_LONG -DRCPP_USING_UTF8_ERROR_STRING -I"/mnt/nfs/home/momeara/opt/lib64/R/library/Rcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/BH/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/bindrcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/plogr/include" -I/usr/local/include   -fpic  -O3 -mtune=native -march=native -Wno-unused-variable -Wno-unused-function -flto -ffat-lto-objects  -Wno-unused-local-typedefs -Wno-ignored-attributes -Wno-deprecated-declarations -c api.cpp -o api.o
+g++  -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG -I../inst/include -DCOMPILING_DPLYR -DBOOST_NO_INT64_T -DBOOST_NO_INTEGRAL_INT64_T -DBOOST_NO_LONG_LONG -DRCPP_USING_UTF8_ERROR_STRING -I"/mnt/nfs/home/momeara/opt/lib64/R/library/Rcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/BH/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/bindrcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/plogr/include" -I/usr/local/include   -fpic  -O3 -mtune=native -march=native -Wno-unused-variable -Wno-unused-function -flto -ffat-lto-objects  -Wno-unused-local-typedefs -Wno-ignored-attributes -Wno-deprecated-declarations -c arrange.cpp -o arrange.o
+g++  -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG -I../inst/include -DCOMPILING_DPLYR -DBOOST_NO_INT64_T -DBOOST_NO_INTEGRAL_INT64_T -DBOOST_NO_LONG_LONG -DRCPP_USING_UTF8_ERROR_STRING -I"/mnt/nfs/home/momeara/opt/lib64/R/library/Rcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/BH/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/bindrcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/plogr/include" -I/usr/local/include   -fpic  -O3 -mtune=native -march=native -Wno-unused-variable -Wno-unused-function -flto -ffat-lto-objects  -Wno-unused-local-typedefs -Wno-ignored-attributes -Wno-deprecated-declarations -c between.cpp -o between.o
+g++  -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG -I../inst/include -DCOMPILING_DPLYR -DBOOST_NO_INT64_T -DBOOST_NO_INTEGRAL_INT64_T -DBOOST_NO_LONG_LONG -DRCPP_USING_UTF8_ERROR_STRING -I"/mnt/nfs/home/momeara/opt/lib64/R/library/Rcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/BH/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/bindrcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/plogr/include" -I/usr/local/include   -fpic  -O3 -mtune=native -march=native -Wno-unused-variable -Wno-unused-function -flto -ffat-lto-objects  -Wno-unused-local-typedefs -Wno-ignored-attributes -Wno-deprecated-declarations -c bind.cpp -o bind.o
+g++  -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG -I../inst/include -DCOMPILING_DPLYR -DBOOST_NO_INT64_T -DBOOST_NO_INTEGRAL_INT64_T -DBOOST_NO_LONG_LONG -DRCPP_USING_UTF8_ERROR_STRING -I"/mnt/nfs/home/momeara/opt/lib64/R/library/Rcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/BH/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/bindrcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/plogr/include" -I/usr/local/include   -fpic  -O3 -mtune=native -march=native -Wno-unused-variable -Wno-unused-function -flto -ffat-lto-objects  -Wno-unused-local-typedefs -Wno-ignored-attributes -Wno-deprecated-declarations -c combine_variables.cpp -o combine_variables.o
+g++  -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG -I../inst/include -DCOMPILING_DPLYR -DBOOST_NO_INT64_T -DBOOST_NO_INTEGRAL_INT64_T -DBOOST_NO_LONG_LONG -DRCPP_USING_UTF8_ERROR_STRING -I"/mnt/nfs/home/momeara/opt/lib64/R/library/Rcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/BH/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/bindrcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/plogr/include" -I/usr/local/include   -fpic  -O3 -mtune=native -march=native -Wno-unused-variable -Wno-unused-function -flto -ffat-lto-objects  -Wno-unused-local-typedefs -Wno-ignored-attributes -Wno-deprecated-declarations -c distinct.cpp -o distinct.o
+g++  -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG -I../inst/include -DCOMPILING_DPLYR -DBOOST_NO_INT64_T -DBOOST_NO_INTEGRAL_INT64_T -DBOOST_NO_LONG_LONG -DRCPP_USING_UTF8_ERROR_STRING -I"/mnt/nfs/home/momeara/opt/lib64/R/library/Rcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/BH/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/bindrcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/plogr/include" -I/usr/local/include   -fpic  -O3 -mtune=native -march=native -Wno-unused-variable -Wno-unused-function -flto -ffat-lto-objects  -Wno-unused-local-typedefs -Wno-ignored-attributes -Wno-deprecated-declarations -c encoding.cpp -o encoding.o
+g++  -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG -I../inst/include -DCOMPILING_DPLYR -DBOOST_NO_INT64_T -DBOOST_NO_INTEGRAL_INT64_T -DBOOST_NO_LONG_LONG -DRCPP_USING_UTF8_ERROR_STRING -I"/mnt/nfs/home/momeara/opt/lib64/R/library/Rcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/BH/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/bindrcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/plogr/include" -I/usr/local/include   -fpic  -O3 -mtune=native -march=native -Wno-unused-variable -Wno-unused-function -flto -ffat-lto-objects  -Wno-unused-local-typedefs -Wno-ignored-attributes -Wno-deprecated-declarations -c filter.cpp -o filter.o
+g++  -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG -I../inst/include -DCOMPILING_DPLYR -DBOOST_NO_INT64_T -DBOOST_NO_INTEGRAL_INT64_T -DBOOST_NO_LONG_LONG -DRCPP_USING_UTF8_ERROR_STRING -I"/mnt/nfs/home/momeara/opt/lib64/R/library/Rcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/BH/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/bindrcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/plogr/include" -I/usr/local/include   -fpic  -O3 -mtune=native -march=native -Wno-unused-variable -Wno-unused-function -flto -ffat-lto-objects  -Wno-unused-local-typedefs -Wno-ignored-attributes -Wno-deprecated-declarations -c group_by.cpp -o group_by.o
+g++  -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG -I../inst/include -DCOMPILING_DPLYR -DBOOST_NO_INT64_T -DBOOST_NO_INTEGRAL_INT64_T -DBOOST_NO_LONG_LONG -DRCPP_USING_UTF8_ERROR_STRING -I"/mnt/nfs/home/momeara/opt/lib64/R/library/Rcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/BH/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/bindrcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/plogr/include" -I/usr/local/include   -fpic  -O3 -mtune=native -march=native -Wno-unused-variable -Wno-unused-function -flto -ffat-lto-objects  -Wno-unused-local-typedefs -Wno-ignored-attributes -Wno-deprecated-declarations -c group_indices.cpp -o group_indices.o
+g++  -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG -I../inst/include -DCOMPILING_DPLYR -DBOOST_NO_INT64_T -DBOOST_NO_INTEGRAL_INT64_T -DBOOST_NO_LONG_LONG -DRCPP_USING_UTF8_ERROR_STRING -I"/mnt/nfs/home/momeara/opt/lib64/R/library/Rcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/BH/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/bindrcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/plogr/include" -I/usr/local/include   -fpic  -O3 -mtune=native -march=native -Wno-unused-variable -Wno-unused-function -flto -ffat-lto-objects  -Wno-unused-local-typedefs -Wno-ignored-attributes -Wno-deprecated-declarations -c hybrid.cpp -o hybrid.o
+g++  -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG -I../inst/include -DCOMPILING_DPLYR -DBOOST_NO_INT64_T -DBOOST_NO_INTEGRAL_INT64_T -DBOOST_NO_LONG_LONG -DRCPP_USING_UTF8_ERROR_STRING -I"/mnt/nfs/home/momeara/opt/lib64/R/library/Rcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/BH/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/bindrcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/plogr/include" -I/usr/local/include   -fpic  -O3 -mtune=native -march=native -Wno-unused-variable -Wno-unused-function -flto -ffat-lto-objects  -Wno-unused-local-typedefs -Wno-ignored-attributes -Wno-deprecated-declarations -c hybrid_count.cpp -o hybrid_count.o
+g++  -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG -I../inst/include -DCOMPILING_DPLYR -DBOOST_NO_INT64_T -DBOOST_NO_INTEGRAL_INT64_T -DBOOST_NO_LONG_LONG -DRCPP_USING_UTF8_ERROR_STRING -I"/mnt/nfs/home/momeara/opt/lib64/R/library/Rcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/BH/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/bindrcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/plogr/include" -I/usr/local/include   -fpic  -O3 -mtune=native -march=native -Wno-unused-variable -Wno-unused-function -flto -ffat-lto-objects  -Wno-unused-local-typedefs -Wno-ignored-attributes -Wno-deprecated-declarations -c hybrid_debug.cpp -o hybrid_debug.o
+g++  -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG -I../inst/include -DCOMPILING_DPLYR -DBOOST_NO_INT64_T -DBOOST_NO_INTEGRAL_INT64_T -DBOOST_NO_LONG_LONG -DRCPP_USING_UTF8_ERROR_STRING -I"/mnt/nfs/home/momeara/opt/lib64/R/library/Rcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/BH/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/bindrcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/plogr/include" -I/usr/local/include   -fpic  -O3 -mtune=native -march=native -Wno-unused-variable -Wno-unused-function -flto -ffat-lto-objects  -Wno-unused-local-typedefs -Wno-ignored-attributes -Wno-deprecated-declarations -c hybrid_in.cpp -o hybrid_in.o
+g++  -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG -I../inst/include -DCOMPILING_DPLYR -DBOOST_NO_INT64_T -DBOOST_NO_INTEGRAL_INT64_T -DBOOST_NO_LONG_LONG -DRCPP_USING_UTF8_ERROR_STRING -I"/mnt/nfs/home/momeara/opt/lib64/R/library/Rcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/BH/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/bindrcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/plogr/include" -I/usr/local/include   -fpic  -O3 -mtune=native -march=native -Wno-unused-variable -Wno-unused-function -flto -ffat-lto-objects  -Wno-unused-local-typedefs -Wno-ignored-attributes -Wno-deprecated-declarations -c hybrid_minmax.cpp -o hybrid_minmax.o
+g++  -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG -I../inst/include -DCOMPILING_DPLYR -DBOOST_NO_INT64_T -DBOOST_NO_INTEGRAL_INT64_T -DBOOST_NO_LONG_LONG -DRCPP_USING_UTF8_ERROR_STRING -I"/mnt/nfs/home/momeara/opt/lib64/R/library/Rcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/BH/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/bindrcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/plogr/include" -I/usr/local/include   -fpic  -O3 -mtune=native -march=native -Wno-unused-variable -Wno-unused-function -flto -ffat-lto-objects  -Wno-unused-local-typedefs -Wno-ignored-attributes -Wno-deprecated-declarations -c hybrid_nth.cpp -o hybrid_nth.o
+g++  -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG -I../inst/include -DCOMPILING_DPLYR -DBOOST_NO_INT64_T -DBOOST_NO_INTEGRAL_INT64_T -DBOOST_NO_LONG_LONG -DRCPP_USING_UTF8_ERROR_STRING -I"/mnt/nfs/home/momeara/opt/lib64/R/library/Rcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/BH/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/bindrcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/plogr/include" -I/usr/local/include   -fpic  -O3 -mtune=native -march=native -Wno-unused-variable -Wno-unused-function -flto -ffat-lto-objects  -Wno-unused-local-typedefs -Wno-ignored-attributes -Wno-deprecated-declarations -c hybrid_offset.cpp -o hybrid_offset.o
+g++  -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG -I../inst/include -DCOMPILING_DPLYR -DBOOST_NO_INT64_T -DBOOST_NO_INTEGRAL_INT64_T -DBOOST_NO_LONG_LONG -DRCPP_USING_UTF8_ERROR_STRING -I"/mnt/nfs/home/momeara/opt/lib64/R/library/Rcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/BH/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/bindrcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/plogr/include" -I/usr/local/include   -fpic  -O3 -mtune=native -march=native -Wno-unused-variable -Wno-unused-function -flto -ffat-lto-objects  -Wno-unused-local-typedefs -Wno-ignored-attributes -Wno-deprecated-declarations -c hybrid_simple.cpp -o hybrid_simple.o
+g++  -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG -I../inst/include -DCOMPILING_DPLYR -DBOOST_NO_INT64_T -DBOOST_NO_INTEGRAL_INT64_T -DBOOST_NO_LONG_LONG -DRCPP_USING_UTF8_ERROR_STRING -I"/mnt/nfs/home/momeara/opt/lib64/R/library/Rcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/BH/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/bindrcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/plogr/include" -I/usr/local/include   -fpic  -O3 -mtune=native -march=native -Wno-unused-variable -Wno-unused-function -flto -ffat-lto-objects  -Wno-unused-local-typedefs -Wno-ignored-attributes -Wno-deprecated-declarations -c hybrid_window.cpp -o hybrid_window.o
+g++  -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG -I../inst/include -DCOMPILING_DPLYR -DBOOST_NO_INT64_T -DBOOST_NO_INTEGRAL_INT64_T -DBOOST_NO_LONG_LONG -DRCPP_USING_UTF8_ERROR_STRING -I"/mnt/nfs/home/momeara/opt/lib64/R/library/Rcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/BH/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/bindrcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/plogr/include" -I/usr/local/include   -fpic  -O3 -mtune=native -march=native -Wno-unused-variable -Wno-unused-function -flto -ffat-lto-objects  -Wno-unused-local-typedefs -Wno-ignored-attributes -Wno-deprecated-declarations -c init.cpp -o init.o
+g++  -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG -I../inst/include -DCOMPILING_DPLYR -DBOOST_NO_INT64_T -DBOOST_NO_INTEGRAL_INT64_T -DBOOST_NO_LONG_LONG -DRCPP_USING_UTF8_ERROR_STRING -I"/mnt/nfs/home/momeara/opt/lib64/R/library/Rcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/BH/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/bindrcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/plogr/include" -I/usr/local/include   -fpic  -O3 -mtune=native -march=native -Wno-unused-variable -Wno-unused-function -flto -ffat-lto-objects  -Wno-unused-local-typedefs -Wno-ignored-attributes -Wno-deprecated-declarations -c join.cpp -o join.o
+g++  -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG -I../inst/include -DCOMPILING_DPLYR -DBOOST_NO_INT64_T -DBOOST_NO_INTEGRAL_INT64_T -DBOOST_NO_LONG_LONG -DRCPP_USING_UTF8_ERROR_STRING -I"/mnt/nfs/home/momeara/opt/lib64/R/library/Rcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/BH/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/bindrcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/plogr/include" -I/usr/local/include   -fpic  -O3 -mtune=native -march=native -Wno-unused-variable -Wno-unused-function -flto -ffat-lto-objects  -Wno-unused-local-typedefs -Wno-ignored-attributes -Wno-deprecated-declarations -c join_exports.cpp -o join_exports.o
+g++  -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG -I../inst/include -DCOMPILING_DPLYR -DBOOST_NO_INT64_T -DBOOST_NO_INTEGRAL_INT64_T -DBOOST_NO_LONG_LONG -DRCPP_USING_UTF8_ERROR_STRING -I"/mnt/nfs/home/momeara/opt/lib64/R/library/Rcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/BH/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/bindrcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/plogr/include" -I/usr/local/include   -fpic  -O3 -mtune=native -march=native -Wno-unused-variable -Wno-unused-function -flto -ffat-lto-objects  -Wno-unused-local-typedefs -Wno-ignored-attributes -Wno-deprecated-declarations -c mutate.cpp -o mutate.o
+gcc -std=gnu99 -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG -I../inst/include -DCOMPILING_DPLYR -DBOOST_NO_INT64_T -DBOOST_NO_INTEGRAL_INT64_T -DBOOST_NO_LONG_LONG -DRCPP_USING_UTF8_ERROR_STRING -I"/mnt/nfs/home/momeara/opt/lib64/R/library/Rcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/BH/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/bindrcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/plogr/include" -I/usr/local/include   -fpic  -I/mnt/nfs/home/momeara/opt/include   -c rlang-export.c -o rlang-export.o
+g++  -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG -I../inst/include -DCOMPILING_DPLYR -DBOOST_NO_INT64_T -DBOOST_NO_INTEGRAL_INT64_T -DBOOST_NO_LONG_LONG -DRCPP_USING_UTF8_ERROR_STRING -I"/mnt/nfs/home/momeara/opt/lib64/R/library/Rcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/BH/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/bindrcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/plogr/include" -I/usr/local/include   -fpic  -O3 -mtune=native -march=native -Wno-unused-variable -Wno-unused-function -flto -ffat-lto-objects  -Wno-unused-local-typedefs -Wno-ignored-attributes -Wno-deprecated-declarations -c select.cpp -o select.o
+g++  -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG -I../inst/include -DCOMPILING_DPLYR -DBOOST_NO_INT64_T -DBOOST_NO_INTEGRAL_INT64_T -DBOOST_NO_LONG_LONG -DRCPP_USING_UTF8_ERROR_STRING -I"/mnt/nfs/home/momeara/opt/lib64/R/library/Rcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/BH/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/bindrcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/plogr/include" -I/usr/local/include   -fpic  -O3 -mtune=native -march=native -Wno-unused-variable -Wno-unused-function -flto -ffat-lto-objects  -Wno-unused-local-typedefs -Wno-ignored-attributes -Wno-deprecated-declarations -c set.cpp -o set.o
+g++  -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG -I../inst/include -DCOMPILING_DPLYR -DBOOST_NO_INT64_T -DBOOST_NO_INTEGRAL_INT64_T -DBOOST_NO_LONG_LONG -DRCPP_USING_UTF8_ERROR_STRING -I"/mnt/nfs/home/momeara/opt/lib64/R/library/Rcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/BH/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/bindrcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/plogr/include" -I/usr/local/include   -fpic  -O3 -mtune=native -march=native -Wno-unused-variable -Wno-unused-function -flto -ffat-lto-objects  -Wno-unused-local-typedefs -Wno-ignored-attributes -Wno-deprecated-declarations -c slice.cpp -o slice.o
+g++  -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG -I../inst/include -DCOMPILING_DPLYR -DBOOST_NO_INT64_T -DBOOST_NO_INTEGRAL_INT64_T -DBOOST_NO_LONG_LONG -DRCPP_USING_UTF8_ERROR_STRING -I"/mnt/nfs/home/momeara/opt/lib64/R/library/Rcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/BH/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/bindrcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/plogr/include" -I/usr/local/include   -fpic  -O3 -mtune=native -march=native -Wno-unused-variable -Wno-unused-function -flto -ffat-lto-objects  -Wno-unused-local-typedefs -Wno-ignored-attributes -Wno-deprecated-declarations -c summarise.cpp -o summarise.o
+g++  -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG -I../inst/include -DCOMPILING_DPLYR -DBOOST_NO_INT64_T -DBOOST_NO_INTEGRAL_INT64_T -DBOOST_NO_LONG_LONG -DRCPP_USING_UTF8_ERROR_STRING -I"/mnt/nfs/home/momeara/opt/lib64/R/library/Rcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/BH/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/bindrcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/plogr/include" -I/usr/local/include   -fpic  -O3 -mtune=native -march=native -Wno-unused-variable -Wno-unused-function -flto -ffat-lto-objects  -Wno-unused-local-typedefs -Wno-ignored-attributes -Wno-deprecated-declarations -c test.cpp -o test.o
+g++  -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG -I../inst/include -DCOMPILING_DPLYR -DBOOST_NO_INT64_T -DBOOST_NO_INTEGRAL_INT64_T -DBOOST_NO_LONG_LONG -DRCPP_USING_UTF8_ERROR_STRING -I"/mnt/nfs/home/momeara/opt/lib64/R/library/Rcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/BH/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/bindrcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/plogr/include" -I/usr/local/include   -fpic  -O3 -mtune=native -march=native -Wno-unused-variable -Wno-unused-function -flto -ffat-lto-objects  -Wno-unused-local-typedefs -Wno-ignored-attributes -Wno-deprecated-declarations -c utils.cpp -o utils.o
+g++  -I/mnt/nfs/home/momeara/opt/lib64/R/include -DNDEBUG -I../inst/include -DCOMPILING_DPLYR -DBOOST_NO_INT64_T -DBOOST_NO_INTEGRAL_INT64_T -DBOOST_NO_LONG_LONG -DRCPP_USING_UTF8_ERROR_STRING -I"/mnt/nfs/home/momeara/opt/lib64/R/library/Rcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/BH/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/bindrcpp/include" -I"/mnt/nfs/home/momeara/opt/lib64/R/library/plogr/include" -I/usr/local/include   -fpic  -O3 -mtune=native -march=native -Wno-unused-variable -Wno-unused-function -flto -ffat-lto-objects  -Wno-unused-local-typedefs -Wno-ignored-attributes -Wno-deprecated-declarations -c window.cpp -o window.o
+g++ -shared -L/mnt/nfs/home/momeara/opt/lib -L/mnt/nfs/home/momeara/opt/lib64 -o dplyr.so RcppExports.o address.o api.o arrange.o between.o bind.o combine_variables.o distinct.o encoding.o filter.o group_by.o group_indices.o hybrid.o hybrid_count.o hybrid_debug.o hybrid_in.o hybrid_minmax.o hybrid_nth.o hybrid_offset.o hybrid_simple.o hybrid_window.o init.o join.o join_exports.o mutate.o rlang-export.o select.o set.o slice.o summarise.o test.o utils.o window.o
+/mnt/nfs/home/momeara/opt/bin/ld: skipping incompatible /mnt/nfs/home/momeara/opt/lib/libstdc++.so when searching for -lstdc++
+/mnt/nfs/home/momeara/opt/bin/ld: skipping incompatible /mnt/nfs/home/momeara/opt/lib/libstdc++.a when searching for -lstdc++
+/mnt/nfs/home/momeara/opt/bin/ld: skipping incompatible /mnt/nfs/home/momeara/opt/lib/libgcc_s.so when searching for -lgcc_s
+/mnt/nfs/home/momeara/opt/bin/ld: skipping incompatible /mnt/nfs/home/momeara/opt/lib/libgcc_s.so when searching for -lgcc_s
+/mnt/nfs/home/momeara/opt/bin/ld: skipping incompatible /mnt/nfs/home/momeara/opt/lib/libstdc++.so when searching for -lstdc++
+/mnt/nfs/home/momeara/opt/bin/ld: skipping incompatible /mnt/nfs/home/momeara/opt/lib/libstdc++.a when searching for -lstdc++
+/mnt/nfs/home/momeara/opt/bin/ld: skipping incompatible /mnt/nfs/home/momeara/opt/lib/libgcc_s.so when searching for -lgcc_s
+/mnt/nfs/home/momeara/opt/bin/ld: skipping incompatible /mnt/nfs/home/momeara/opt/lib/libgcc_s.so when searching for -lgcc_s
+installing to /mnt/nfs/home/momeara/opt/lib64/R/library/dplyr/libs
+** R
+** data
+*** moving datasets to lazyload DB
+** inst
+** tests
+** preparing package for lazy loading
+** help
+*** installing help indices
+*** copying figures
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded
+* DONE (dplyr)
+> devtools::install_github("tidyverse/dbplyr")
+Downloading GitHub repo tidyverse/dbplyr@master
+from URL https://api.github.com/repos/tidyverse/dbplyr/zipball/master
+Installing dbplyr
+'/mnt/nfs/home/momeara/opt/lib64/R/bin/R' --no-site-file --no-environ  \
+  --no-save --no-restore --quiet CMD INSTALL  \
+  '/tmp/Rtmp4hQ74r/devtools6dbe4518513f/tidyverse-dbplyr-ea093ca'  \
+  --library='/mnt/nfs/home/momeara/opt/lib64/R/library' --install-tests 
+
+* installing *source* package ‘dbplyr’ ...
+** R
+** inst
+** tests
+** preparing package for lazy loading
+** help
+*** installing help indices
+*** copying figures
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded
+* DONE (dbplyr)
+> devtools::install_github("r-dbi/RPostgres")
+Downloading GitHub repo r-dbi/RPostgres@master
+from URL https://api.github.com/repos/r-dbi/RPostgres/zipball/master
+Installing RPostgres
+trying URL 'https://cran.rstudio.com/src/contrib/withr_2.1.1.tar.gz'
+Content type 'application/x-gzip' length 52603 bytes (51 KB)
+==================================================
+downloaded 51 KB
+
+Installing withr
+'/mnt/nfs/home/momeara/opt/lib64/R/bin/R' --no-site-file --no-environ  \
+  --no-save --no-restore --quiet CMD INSTALL  \
+  '/tmp/Rtmp4hQ74r/devtools6dbe7f55e72d/withr'  \
+  --library='/mnt/nfs/home/momeara/opt/lib64/R/library' --install-tests 
+
+* installing *source* package ‘withr’ ...
+** package ‘withr’ successfully unpacked and MD5 sums checked
+** R
+** inst
+** tests
+** preparing package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded
+* DONE (withr)
+'/mnt/nfs/home/momeara/opt/lib64/R/bin/R' --no-site-file --no-environ  \
+  --no-save --no-restore --quiet CMD INSTALL  \
+  '/tmp/Rtmp4hQ74r/devtools6dbed09a5e6/r-dbi-RPostgres-512f13f'  \
+  --library='/mnt/nfs/home/momeara/opt/lib64/R/library' --install-tests 
+
+* installing *source* package ‘RPostgres’ ...
+Found pg_config includedir and libdir (PostgreSQL 8.4.20)!
+This version of libpq is too old! We need at least 9.0!
+ERROR: configuration failed for package ‘RPostgres’
+* removing ‘/mnt/nfs/home/momeara/opt/lib64/R/library/RPostgres’
+Installation failed: Command failed (1)
+> pfam_regions <- readr::read_tsv(
+	paste0(staging_directory, "/Pfam-A.regions.tsv"),
+	col_types=cols(
+	  pfamseq_acc = col_character(),
+	  seq_version = col_double(),
+	  crc64 = col_character(),
+	  md5 = col_character(),
+	  pfamA_acc = col_character(),
+	  seq_start = col_double(),
+	  seq_end = col_double())) %>%
+	dplyr::select(
+		uniprot_accn = pfamseq_acc,
+		pfamA_acc,
+		seq_start,
+		seq_end)
+
+pfam_regions <- readr::read_tsv(
++ 	paste0(staging_directory, "/Pfam-A.regions.tsv"),
++ 	col_types=cols(
++ 	  pfamseq_acc = col_character(),
++ 	  seq_version = col_double(),
++ 	  crc64 = col_character(),
++ 	  md5 = col_character(),
++ 	  pfamA_acc = col_character(),
++ 	  seq_start = col_double(),
++ 	  seq_end = col_double())) %>%
++ 	dplyr::select(
++ 		uniprot_accn = pfamseq_acc,
++ 		pfamA_acc,
++ 		seq_start,
++ 		seq_end)
+Error in readr::read_tsv(paste0(staging_directory, "/Pfam-A.regions.tsv"),  : 
+  could not find function "%>%"
+> library(plyr)
+library(dplyr)
+library(readr)
+library(stringr)
+library(BioChemPantry)
+
+library(plyr)
+> library(dplyr)
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:plyr’:
+
+    arrange, count, desc, failwith, id, mutate, rename, summarise,
+    summarize
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+> library(readr)
+> library(stringr)
+> library(BioChemPantry)
+> pantry <- get_pantry()
+pantry %>% create_schema('pfam31')
+pantry %>% set_schema('pfam31')
+staging_directory <- get_staging_directory("pfam31/dump")
+
+pantry <- get_pantry()
+> pantry %>% create_schema('pfam31')
+Error in postgresqlExecStatement(conn, statement, ...) : 
+  RS-DBI driver: (could not Retrieve the result : ERROR:  schema "pfam31" already exists
+)
+NULL
+Warning message:
+In postgresqlQuickSQL(conn, statement, ...) :
+  Could not create execute: CREATE SCHEMA pfam31;
+> pantry %>% set_schema('pfam31')
+> staging_directory <- get_staging_directory("pfam31/dump")
+Staging directory:  /mnt/nfs/work/momeara/pantry_sets/pfam31/dump 
+> pfam_regions <- readr::read_tsv(
+	paste0(staging_directory, "/Pfam-A.regions.tsv"),
+	col_types=cols(
+	  pfamseq_acc = col_character(),
+	  seq_version = col_double(),
+	  crc64 = col_character(),
+	  md5 = col_character(),
+	  pfamA_acc = col_character(),
+	  seq_start = col_double(),
+	  seq_end = col_double())) %>%
+	dplyr::select(
+		uniprot_accn = pfamseq_acc,
+		pfamA_acc,
+		seq_start,
+		seq_end)
+
+pfam_regions <- readr::read_tsv(
++ 	paste0(staging_directory, "/Pfam-A.regions.tsv"),
++ 	col_types=cols(
++ 	  pfamseq_acc = col_character(),
++ 	  seq_version = col_double(),
++ 	  crc64 = col_character(),
++ 	  md5 = col_character(),
++ 	  pfamA_acc = col_character(),
++ 	  seq_start = col_double(),
++ 	  seq_end = col_double())) %>%
++ 	dplyr::select(
++ 		uniprot_accn = pfamseq_acc,
++ 		pfamA_acc,
++ 		seq_start,
++ 		seq_end)
+|=================================================================| 100% 2250 MB
+> pantry %>% copy_to(
+	pfam_regions,
+	"regions",
+	temporary=F,
+	indices=list(
+		"uniprot_accn"))
+
+pantry %>% copy_to(
++ 	pfam_regions,
++ 	"regions",
++ 	temporary=F,
++ 	indices=list(
++ 		"uniprot_accn"))
+Error in postgresqlExecStatement(conn, statement, ...) : 
+  RS-DBI driver: (could not Retrieve the result : ERROR:  out of memory
+DETAIL:  Cannot enlarge string buffer containing 0 bytes by 1211381544 more bytes.
+)
+> pfam_regions %>% head
+# A tibble: 6 x 4
+  uniprot_accn pfamA_acc seq_start seq_end
+  <chr>        <chr>         <dbl>   <dbl>
+1 A0A140DYS3   PF12892        1205    1346
+2 A0A140DYS3   PF12892        1352    1470
+3 A0A140DYS3   PF12892        1054    1198
+4 A0A140DYS3   PF12892        1718    1922
+5 A0A140DYS3   PF12892        1477    1587
+6 I5ASN7       PF12892        2507    2624
+> save("pfam_regions", file=paste0(staging_directory, "/pfam_regions.Rdata"))
+> chembl <- chembl %>%
+	dplyr::semi_join(
+		chembl_families,
+		by=c("class_2"))
+
+chembl <- chembl %>%
++ 	dplyr::semi_join(
++ 		chembl_families,
++ 		by=c("class_2"))
+Error in eval(lhs, parent, parent) : object 'chembl' not found
+> pfam_clans <- read_tsv(
+	paste0(staging_directory, "/Pfam-A.clans.tsv"),
+	col_names=c("pfamA_acc", "clan_acc", "pfamA_alt_id", "pfamA_id", "pfamA_description"),
+	col_types=cols(
+	  pfamA_acc = col_character(),
+	  clan_acc = col_character(),
+	  pfamA_alt_id = col_character(),
+	  pfamA_id = col_character(),
+	  pfamA_description = col_character()))
+
+pfam_clans <- read_tsv(
++ 	paste0(staging_directory, "/Pfam-A.clans.tsv"),
++ 	col_names=c("pfamA_acc", "clan_acc", "pfamA_alt_id", "pfamA_id", "pfamA_description"),
++ 	col_types=cols(
++ 	  pfamA_acc = col_character(),
++ 	  clan_acc = col_character(),
++ 	  pfamA_alt_id = col_character(),
++ 	  pfamA_id = col_character(),
++ 	  pfamA_description = col_character()))
+> 

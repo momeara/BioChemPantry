@@ -9,4 +9,3 @@ get_schemas(pantry, verbose = T)
 \description{
 Get all available schemas
 }
-

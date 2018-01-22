@@ -9,4 +9,3 @@ test_null_count(data, ids, count)
 \description{
 test number null
 }
-

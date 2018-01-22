@@ -17,4 +17,3 @@ list of login parameters for Postgres database
 \description{
 Get and check login information for Postgres database
 }
-

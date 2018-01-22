@@ -9,4 +9,3 @@ make_symmetric(data, ids)
 \description{
 make a dataset symmetric
 }
-

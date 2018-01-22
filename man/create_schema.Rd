@@ -9,4 +9,3 @@ create_schema(pantry, schema_name)
 \description{
 Create a schema in the pantry
 }
-

@@ -9,4 +9,3 @@ schema_tbl(pantry, schema_table)
 \description{
 Identify a table qualified by a schema. This works around issue 244 in dplyr
 }
-

@@ -9,4 +9,3 @@ get_search_path(pantry)
 \description{
 Get the search path for looking for namespaces
 }
-

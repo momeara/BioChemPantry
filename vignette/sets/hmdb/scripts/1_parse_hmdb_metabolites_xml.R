@@ -12,10 +12,13 @@ library(BioChemPantry)
 #####################################
 # Analysis parameters
 
-staging_directory <- BioChemPantry::get_staging_directory("hmdb")
+schema <- "hmdb_180122"
+staging_directory <- BioChemPantry::get_staging_directory(schema)
+
+dir.create(paste0(staging_directory, "/data"))
 
 # input paths
-hmdb_metabolites_xml <- paste0(staging_directory, "/dump/hmdb_metabolites_tmp.xml") %>%
+hmdb_metabolites_xml <- paste0(staging_directory, "/dump/hmdb_metabolites.xml") %>%
 	xml2::read_xml()
 
 
@@ -90,6 +93,19 @@ m_data <- hmdb_metabolites_xml %>%
 			origin_cosmetic = from_origin("Cosmetic"))
 	})
 
-dir.create(paste0(staging_directory, "/data"))
+
+kingdom_is_chemical_entities <- m_data$taxonomy_kingdom == "Chemical entities"
+m_data <- m_data %>%
+	dplyr::mutate(
+		taxonomy_kingdom = ifelse(kingdom_is_chemical_entities, taxonomy_super_class, taxonomy_kingdom),
+		taxonomy_super_class = ifelse(kingdom_is_chemical_entities, taxonomy_class, taxonomy_super_class),
+		taxonomy_class = ifelse(kingdom_is_chemical_entities, taxonomy_sub_class, taxonomy_class),
+		taxonomy_sub_class = ifelse(kingdom_is_chemical_entities, NA, taxonomy_sub_class))
+
+
 m_data %>% readr::write_tsv(paste0(staging_directory, "/data/metabolites.tsv"))
+
+
+
+
 

@@ -9,4 +9,3 @@ test_null_frac(data, ids, frac)
 \description{
 test fraction null
 }
-

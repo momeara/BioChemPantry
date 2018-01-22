@@ -11,4 +11,3 @@ test_distinct(data, ids)
 test distinct rows
 e.g. for testing for network loops
 }
-

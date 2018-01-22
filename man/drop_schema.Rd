@@ -9,4 +9,3 @@ drop_schema(pantry, schema_name)
 \description{
 Drop a schema from the pantry
 }
-

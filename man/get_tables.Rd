@@ -9,4 +9,3 @@ get_tables(pantry, all_tables = FALSE)
 \description{
 Get all tables in the active schema or search path
 }
-

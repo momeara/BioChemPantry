@@ -11,4 +11,3 @@ test_is_symmetric(data, ids, values)
 test if the columns names(ids) are symmetric to the columns ids
 and for those that are symmetric, test equality over the value columns
 }
-

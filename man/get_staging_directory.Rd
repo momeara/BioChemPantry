@@ -4,7 +4,8 @@
 \alias{get_staging_directory}
 \title{Get the staging directory for the given dataset}
 \usage{
-get_staging_directory(data_set, pantry_config = "~/.pantry_config")
+get_staging_directory(data_set, pantry_config = "~/.pantry_config",
+  verbose = TRUE)
 }
 \arguments{
 \item{data_set}{A tag for the given dataset}
@@ -17,4 +18,3 @@ get_staging_directory(data_set, pantry_config = "~/.pantry_config")
 \description{
 Get the staging directory for the given dataset
 }
-

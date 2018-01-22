@@ -4,9 +4,8 @@
 \alias{set_schema}
 \title{Set a schema as the active schema}
 \usage{
-set_schema(pantry, schema_name)
+set_schema(pantry, schema_name, include_temp = TRUE)
 }
 \description{
 Set a schema as the active schema
 }
-

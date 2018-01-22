@@ -17,4 +17,3 @@ a connection to the the pantry
 Attach to the pantry database, optionally using a schema. If the
 specified schema doesn't exist, create it.
 }
-

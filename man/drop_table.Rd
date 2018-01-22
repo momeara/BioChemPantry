@@ -9,4 +9,3 @@ drop_table(pantry, table)
 \description{
 Drop a table
 }
-

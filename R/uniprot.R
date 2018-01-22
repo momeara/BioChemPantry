@@ -67,7 +67,8 @@ uniprot_web_batch_debug <- function(
 	content
 }
 
-
+#' Get lookup info for given uniprot accessions one at a time
+#' @export
 uniprot_web_lookup <- function(
 	uniprot_accns,
 	columns = c("entry name"),
@@ -115,12 +116,17 @@ uniprot_web_lookup <- function(
 	r2
 }
 
-#http://www.uniprot.org/help/uniprotkb_column_names
-# given a vector of uniprot entries return information about them
+#' Get lookup info for given uniprot entries one at a time
+#'
+#'  #http://www.uniprot.org/help/uniprotkb_column_names
+#'  given a vector of uniprot entries return information about them
+#'
+#' @export
 uniprot_entry_web_lookup <- function(
 	uniprot_entries,
 	columns = c("entry name"),
-	verbose=F){
+	format='tab',
+	verbose=FALSE){
 	library(httr)
 	library(plyr)
 	library(dplyr)
@@ -141,7 +147,7 @@ uniprot_entry_web_lookup <- function(
 				user_agent_arg,
 				query = list(
 					query=df$uniprot_entry,
-					format = 'tab',
+					format = format,
 					columns = column_arg)) %>%
 			content
 			if(r %>% is.null){
@@ -166,12 +172,12 @@ uniprot_entry_web_lookup <- function(
 	r2
 }
 
-
+#' Get all taxa below a given ancestor taxa
+#' @export
 uniprot_taxa <- function(
 	ancestor=7711, # chordate
 	reviewed=TRUE,
 	format='tab',
-	compress=TRUE,
 	verbose=F
 ){
 	library(httr)
@@ -192,8 +198,7 @@ uniprot_taxa <- function(
 		query = list(
 			query=query_arg,
 			format = 'tab',
-			compress=ifelse(compress, 'yes', 'no')) %>%
-		httr::content())
+			compress='yes'))
 
 	if(r %>% is.null){
 		if(verbose){
@@ -203,7 +208,34 @@ uniprot_taxa <- function(
 	}
 
 	r %>%
-		readr::read_tsv() %>%
+		httr::content() %>%
+		rawConnection() %>%
+		gzcon() %>%
+		readr::read_tsv(
+			col_types=readr::cols(
+				Taxon = readr::col_double(),
+				Mnemonic = readr::col_character(),
+				`Scientific name` = readr::col_character(),
+				`Common name` = readr::col_character(),
+				Synonym = readr::col_character(),
+				`Other Names` = readr::col_character(),
+				Reviewed = readr::col_character(),
+				Rank = readr::col_character(),
+				Lineage = readr::col_character(),
+				Parent = readr::col_double(),
+				`Virus hosts` = readr::col_character())) %>%
+		dplyr::select(
+			taxon=Taxon,
+			mnemonic=Mnemonic,
+			scientific_name=`Scientific name`,
+			common_name=`Common name`,
+			synonym=Synonym,
+			other_name=`Other Names`,
+			reviewed=Reviewed,
+			rank=Rank,
+			lineage=Lineage,
+			parent=Parent,
+			virus_hosts=`Virus hosts`) %>%
 		return
 }
 

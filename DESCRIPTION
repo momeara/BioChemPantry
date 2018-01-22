@@ -27,4 +27,6 @@ License: MIT + file LICENSE
 Collage: 'quality_tests.R'
     'id_utils.R'
     'pantry.R'
-RoxygenNote: 5.0.1
+    'r_utils.R'
+    'uniprot.R'
+RoxygenNote: 6.0.1
