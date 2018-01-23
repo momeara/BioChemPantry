@@ -29,9 +29,9 @@ hmdbendo_substances <- Zr::catalog_items(
 	result_batch_size=10000,
 	verbose=T) %>%
 	dplyr::select(
-		zinc_id,
 		accession=supplier_code,
-		preferred_name = substance.preferred_name,
+		zinc_id,
+		zinc_name = substance.preferred_name,
 		zinc_smiles = substance.smiles)
 
 hmdbendo_substances %>% readr::write_tsv(

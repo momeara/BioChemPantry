@@ -17,6 +17,8 @@ staging_directory <- BioChemPantry::get_staging_directory(schema)
 
 dir.create(paste0(staging_directory, "/data"))
 
+z_data <- readr::read_tsv(paste0(staging_directory, "/data/hmdbendo_substances.tsv"))
+
 # input paths
 hmdb_metabolites_xml <- paste0(staging_directory, "/dump/hmdb_metabolites.xml") %>%
 	xml2::read_xml()
@@ -34,6 +36,7 @@ xml_child_by_name <- function(xml, name){
 		magrittr::extract2(child_index)
 }
 
+# this takes several hours to run
 m_data <- hmdb_metabolites_xml %>%
 	xml2::xml_children() %>%
 	plyr::ldply(function(metabolite){
@@ -94,6 +97,7 @@ m_data <- hmdb_metabolites_xml %>%
 	})
 
 
+# HMDB classification, some compounds have an extra chemical entities layer at the top that provides no information
 kingdom_is_chemical_entities <- m_data$taxonomy_kingdom == "Chemical entities"
 m_data <- m_data %>%
 	dplyr::mutate(
@@ -103,9 +107,9 @@ m_data <- m_data %>%
 		taxonomy_sub_class = ifelse(kingdom_is_chemical_entities, NA, taxonomy_sub_class))
 
 
+m_data <- m_data %>%
+	dplyr::left_join(
+		z_data,
+		by=c("accession"))
+
 m_data %>% readr::write_tsv(paste0(staging_directory, "/data/metabolites.tsv"))
-
-
-
-
-

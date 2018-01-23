@@ -70,20 +70,19 @@ get_pantry <- function(schema=NULL, pantry_config="~/.pantry_config"){
 #' Create a schema in the pantry
 #' @export
 create_schema <- function(pantry, schema_name){
-	DBI::dbSendQuery(pantry, paste0("CREATE SCHEMA ", schema_name %>% dplyr::sql(), ";")) %T>%
-		DBI::dbFetch() %T>%
-		DBI::dbClearResult()
-
+	rs <- DBI::dbSendQuery(pantry, paste0("CREATE SCHEMA ", schema_name %>% dplyr::sql(), ";"))
+	DBI::dbFetch(rs)
+	DBI::dbClearResult(rs)
 }
 
 #' Drop a schema from the pantry
 #' @export
 drop_schema <- function(pantry, schema_name){
-	DBI::dbSendQuery(
+	rs <- DBI::dbSendQuery(
 		pantry,
-		paste0("DROP SCHEMA \"", schema_name, "\" CASCADE;")) %T>%
-		DBI::dbFetch() %T>%
-		DBI::dbClearResult()
+		paste0("DROP SCHEMA \"", schema_name, "\" CASCADE;"))
+	DBI::dbFetch(rs)
+	DBI::dbClearResult(rs)
 }
 
 #' Set a schema as the active schema
@@ -105,9 +104,9 @@ set_schema <- function(pantry, schema_name, include_temp=TRUE){
 
 	search_path <- paste(search_path, collapse=",")
 
-	pantry %>% DBI::dbSendQuery(paste0("SET search_path TO ", search_path, ";")) %T>%
-		DBI::dbFetch() %T>%
-		DBI::dbClearResult()
+	rs <- pantry %>% DBI::dbSendQuery(paste0("SET search_path TO ", search_path, ";"))
+	DBI::dbFetch(rs)
+	DBI::dbClearResult(rs)
 }
 
 #' Get the search path for looking for namespaces
@@ -142,9 +141,7 @@ get_tables <- function(pantry, all_tables=FALSE){
 	tables <- DBI::dbGetQuery(pantry, paste0(
 		"SELECT schemaname, tablename FROM pg_tables ",
 		"WHERE schemaname != 'information_schema' AND schemaname !='pg_catalog'"))
-	if(is.null(schema)){
-		schema <- BioChemPantry::get_search_path(pantry)
-	}
+	schema <- BioChemPantry::get_search_path(pantry)
 	if(!all_tables){
 		if(length(schema) > 0){
 			tables <- tables[tables$schemaname %in% schema,]
@@ -156,10 +153,9 @@ get_tables <- function(pantry, all_tables=FALSE){
 #' Drop a table
 #' @export
 drop_table <- function(pantry, table){
-	DBI::dbSendQuery(pantry, paste0("DROP TABLE \"", table, "\" CASCADE;")) %T>%
-		DBI::dbFetch() %T>%
-		DBI::dbClearResult()
-
+	rs <- DBI::dbSendQuery(pantry, paste0("DROP TABLE \"", table, "\" CASCADE;"))
+#	DBI::dbFetch(rs)
+	DBI::dbClearResult(rs)
 }
 
 #' Identify a table qualified by a schema. This works around issue 244 in dplyr
