@@ -6,10 +6,8 @@ library(dplyr)
 library(stringr)
 library(readr)
 library(assertr)
-#library(openxlsx)
 library(BioChemPantry)
 library(Zr)
-#library(SEAR)
 library(curl)
 
 
@@ -277,7 +275,6 @@ interactions_1 <- readr::read_csv(
 	file=interactions_fname,
 	col_types=readr::cols_only(
 			target_id = readr::col_integer(),
-			target_uniprot = readr::col_character(),
 			ligand_id = readr::col_integer(),
 			type = readr::col_character(),
 			action = readr::col_character(),
@@ -300,8 +297,12 @@ interactions <- interactions_1 %>%
 		interaction_type = type,
 		interaction_action = action) %>%
 	dplyr::left_join(
-		ligands %>% dplyr::select(ligand_id, smiles, zinc_id),
-		by="ligand_id")
+		ligands %>% dplyr::select(ligand_id, name, smiles, zinc_id),
+		by="ligand_id") %>%
+	dplyr::left_join(
+		targets %>% dplyr::select(target_id, target_name, uniprot_entry),
+		by="target_id")
+
 
 
 #####
@@ -328,10 +329,10 @@ pantry %>% dplyr::copy_to(
 	"interactions",
 	temporary=FALSE,
 	indexes = list(
-		"target_id", "target_uniprot",
+		"target_id", "uniprot_entry",
 		"ligand_id",
 		c("target_id", "ligand_id"),
-		c("target_uniprot", "zinc_id")))
+		c("uniprot_entry", "zinc_id")))
 
 
 

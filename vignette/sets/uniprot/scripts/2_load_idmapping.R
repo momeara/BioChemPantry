@@ -28,6 +28,7 @@ pantry %>% dplyr::db_begin()
 tryCatch({
 	pantry %>%
 		BioChemPantry::get_tables() %>%
+		dplyr::filter(tablename %>% stringr::str_detect("^to_")) %>%
 		plyr::a_ply(1, function(df){
 			pantry %>% BioChemPantry::drop_table(df$tablename[1])
 		})
@@ -50,10 +51,7 @@ tryCatch({
 
 kingdom <- "Eukaryota"
 ancestor <- 7711 # chordate
-taxa <- BioChemPantry::uniprot_taxa(ancestor=ancestor) %>%
-	dplyr::select(
-		common_name=`Common name`,
-		taxon=Taxon)
+taxa <- BioChemPantry::uniprot_taxa(ancestor=ancestor)
 
 idmapping_files <- list.files(
 	path=paste0(staging_directory, "/dump/", kingdom),
@@ -67,12 +65,12 @@ idmapping_files <- list.files(
 	dplyr::left_join(taxa, by="taxon")
 
 
-pantry %>% dbplyr:::db_begin()
+pantry %>% dplyr:::db_begin()
 tryCatch({
 	idmapping_files %>%
 		plyr::a_ply(1,
 			function(df) {
-				cat("Reading ids for '", df$common_name[1], "' taxon='", df$taxon[1], "' ...\n", sep="")
+				cat("Reading ids for '", df$scientific_name[1], "' taxon='", df$taxon[1], "' ...\n", sep="")
 				idmapping <- readr::read_tsv(
 					file=df$fname[1],
 					col_names=c(

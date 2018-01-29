@@ -71,7 +71,6 @@ get_pantry <- function(schema=NULL, pantry_config="~/.pantry_config"){
 #' @export
 create_schema <- function(pantry, schema_name){
 	rs <- DBI::dbSendQuery(pantry, paste0("CREATE SCHEMA ", schema_name %>% dplyr::sql(), ";"))
-	DBI::dbFetch(rs)
 	DBI::dbClearResult(rs)
 }
 
@@ -81,7 +80,6 @@ drop_schema <- function(pantry, schema_name){
 	rs <- DBI::dbSendQuery(
 		pantry,
 		paste0("DROP SCHEMA \"", schema_name, "\" CASCADE;"))
-	DBI::dbFetch(rs)
 	DBI::dbClearResult(rs)
 }
 
@@ -136,25 +134,37 @@ get_schemas <- function(pantry, verbose=T){
 }
 
 #' Get all tables in the active schema or search path
+#'
+#' @param schema
+#'    If 'current' then return tables for the current schema
+#'    If 'all' then return tables for all schemas
+#'    If othwerwise, return tables for the given schema
+#' @return tibble::data_frame with columns ['schema_name', 'column_name']
 #' @export
-get_tables <- function(pantry, all_tables=FALSE){
-	tables <- DBI::dbGetQuery(pantry, paste0(
-		"SELECT schemaname, tablename FROM pg_tables ",
-		"WHERE schemaname != 'information_schema' AND schemaname !='pg_catalog'"))
-	schema <- BioChemPantry::get_search_path(pantry)
-	if(!all_tables){
-		if(length(schema) > 0){
-			tables <- tables[tables$schemaname %in% schema,]
-		}
+get_tables <- function(pantry, schema='current'){
+	tables <- pantry %>%
+		dplyr::tbl("pg_tables") %>%
+		dplyr::select(
+			schema_name = schemaname,
+			table_name = tablename) %>%
+		dplyr::filter(
+			schema_name != "information_schema",
+			schema_name != "pg_catalog")
+
+	if (schema == 'current'){
+		schema <- BioChemPantry::get_search_path(pantry)
 	}
-	tables
+	if((schema != 'all') && (length(schema) > 0)){
+		tables <- tables %>%
+			dplyr::filter(schema_name %in% schema)
+	}
+	tables %>% dplyr::collect(n=Inf)
 }
 
 #' Drop a table
 #' @export
 drop_table <- function(pantry, table){
 	rs <- DBI::dbSendQuery(pantry, paste0("DROP TABLE \"", table, "\" CASCADE;"))
-#	DBI::dbFetch(rs)
 	DBI::dbClearResult(rs)
 }
 
@@ -166,6 +176,40 @@ schema_tbl <- function(pantry, schema_table){
 	pantry %>%
 		dplyr::tbl(structure(paste0("SELECT * FROM ",  schema_table), class=c("sql", "character")))
 }
+
+#' @export
+disk_usage <- function(pantry){
+	# from https://wiki.postgresql.org/wiki/Disk_Usage
+	pantry %>% DBI::dbGetQuery(
+		"SELECT *, pg_size_pretty(total_bytes) AS total
+			    , pg_size_pretty(index_bytes) AS INDEX
+			    , pg_size_pretty(toast_bytes) AS toast
+			    , pg_size_pretty(table_bytes) AS TABLE
+			  FROM (
+						  SELECT *, total_bytes-index_bytes-COALESCE(toast_bytes,0) AS table_bytes FROM (
+									      SELECT c.oid,nspname AS table_schema, relname AS TABLE_NAME
+									              , c.reltuples AS row_estimate
+									              , pg_total_relation_size(c.oid) AS total_bytes
+									              , pg_indexes_size(c.oid) AS index_bytes
+									              , pg_total_relation_size(reltoastrelid) AS toast_bytes
+									          FROM pg_class c
+									          LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
+									          WHERE relkind = 'r'
+									  ) a
+						) a;") %>%
+		dplyr::arrange(desc(total_bytes))
+}
+
+#' @export
+database_size <- function(pantry){
+	# from http://www.postgresonline.com/journal/archives/233-How-big-is-my-database-and-my-other-stuff.html
+	pantry %>% DBI::dbGetQuery("
+			SELECT
+				pg_size_pretty( pg_database_size( current_database() ) ) As human_size,
+				pg_database_size( current_database() ) as raw_size;")
+}
+
+
 
 # #' this adds the fast argument working around a known problem in dplyr and DBI
 # #' https://github.com/hadley/dplyr/blob/master/R/tbl-sql.r#L294

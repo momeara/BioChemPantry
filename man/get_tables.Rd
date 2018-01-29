@@ -4,7 +4,15 @@
 \alias{get_tables}
 \title{Get all tables in the active schema or search path}
 \usage{
-get_tables(pantry, all_tables = FALSE)
+get_tables(pantry, schema = "current")
+}
+\arguments{
+\item{schema}{If 'current' then return tables for the current schema
+If 'all' then return tables for all schemas
+If othwerwise, return tables for the given schema}
+}
+\value{
+tibble::data_frame with columns ['schema_name', 'column_name']
 }
 \description{
 Get all tables in the active schema or search path
