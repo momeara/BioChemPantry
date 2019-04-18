@@ -6,6 +6,7 @@ wide range formats, and are rapidly changing. This is an opinionated
 guide to collect and curate data sets. It sets up a local database of
 datasets that can be used for an integrated analysis.
 
+ChEMBL is evolving each year. It might on ChEMBL25 does not mean it would with future releases
 
 ## to install:
 1. Install a postgres database (http://www.postgresql.org/)
