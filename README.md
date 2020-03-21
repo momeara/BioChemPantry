@@ -41,4 +41,4 @@ datasets that can be used for an integrated analysis.
    pantry <- get_pantry(schema=<dataset>)
 
    tbl <- pantry %>% schema_tbl("<tbl>")
-   # a dplyr table
+
