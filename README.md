@@ -12,33 +12,43 @@ datasets that can be used for an integrated analysis.
 
 1a. Create the `json` file ~/.pantry_login that will be passed to `dplyr::src_postgres` to login ot the database. For example:
 
-  {
-      "dbname" : "<database name",
-      "host" : "<host>",
-      "user" : "<user>",
-      "password" : "<password>",
-      "port" : <port>
-  }     
+```json
+{
+  "staging_directory" : "/mnt/nfs/work/momeara/pantry_sets",
+  "login" : {
+    "dbname" : "<database name",
+    "host" : "<host>",
+    "user" : "<user>",
+    "password" : "<password>",
+    "port" : <port>
+  }
+}
+```
 
-2. Install the package
+2. Install the package in R
 
-  install.packages("devtools")
+```R
+install.packages("devtools")
+devtools::install_github("momeara/BioChemPantry")
+```
 
-  devtools::install_github("momeara/BioChemPantry")
-  
 # usage:
 
 1. Install datasets
 
-  library(BioChemPantry)
-  
-  
-2. Use datasets
+```R
+library(BioChemPantry)
+```
 
-   library(plyr)
-   library(dplyr)
-   library(BioChemPantry)
-   pantry <- get_pantry(schema=<dataset>)
+2. Load datasets by following the vignettes in `vignettes/sets/`
+  
+3. Use datasets
 
-   tbl <- pantry %>% schema_tbl("<tbl>")
-   # a dplyr table
+```R
+library(plyr)
+library(dplyr)
+library(BioChemPantry)
+pantry <- get_pantry(schema=<dataset>)
+
+tbl <- pantry %>% schema_tbl("<tbl>")
+```
