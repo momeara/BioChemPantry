@@ -9,5 +9,5 @@ Rplots.pdf
 .Rhistory
 .Rbuildignore
 .RData
-
+.RDataTmp
 
