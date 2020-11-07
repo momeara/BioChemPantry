@@ -11,7 +11,8 @@ library(Zr)
 library(curl)
 
 
-schema <- "guide_to_pharmacology_2017_6"
+httr::set_config( httr::config( ssl_verifypeer = 0L ) )
+schema <- "guide_to_pharmacology_2020_03"
 pantry <- get_pantry()
 pantry %>% BioChemPantry::create_schema(schema)
 pantry %>% BioChemPantry::set_schema(schema)
@@ -22,35 +23,34 @@ dir.create(paste0(staging_directory, "/data"), recursive=TRUE)
 
 #########################
 HGNC_mapping_fname <- paste0(staging_directory, "/dump/GtP_to_HGNC_mapping.csv")
-curl::curl_download(
-	url="http://www.guidetopharmacology.org/DATA/GtP_to_HGNC_mapping.csv",
-	destfile= HGNC_mapping_fname)
+httr::GET(url="http://www.guidetopharmacology.org/DATA/GtP_to_HGNC_mapping.csv",
+  httr::write_disk(HGNC_mapping_fname, overwrite=TRUE))
 
 uniprot_mapping_fname <- paste0(staging_directory, "/dump/GtP_to_UniProt_mapping.csv")
-curl::curl_download(
+httr::GET(
 	url="http://www.guidetopharmacology.org/DATA/GtP_to_UniProt_mapping.csv",
-	destfile=uniprot_mapping_fname)
+	httr::write_disk(uniprot_mapping_fname, overwrite=TRUE))
 
 
 targets_fname <- paste0(staging_directory, "/dump/targets_and_families.csv")
-curl::curl_download(
+httr::GET(
 	url="http://www.guidetopharmacology.org/DATA/targets_and_families.csv",
-	destfile=targets_fname)
+	httr::write_disk(targets_fname, overwrite=TRUE))
 
 ligands_fname <- paste0(staging_directory, "/dump/ligands.csv")
-curl::curl_download(
+httr::GET(
 	url="http://www.guidetopharmacology.org/DATA/ligands.csv",
-	destfile=ligands_fname)
+	httr::write_disk(ligands_fname, overwrite=TRUE))
 
 peptides_fname <- paste0(staging_directory, "/dump/peptides.csv")
-curl::curl_download(
+httr::GET(
 	url="http://www.guidetopharmacology.org/DATA/peptides.csv",
-	destfile=peptides_fname)
+  httr::write_disk(peptides_fname, overwrite=TRUE))
 
 interactions_fname <- paste0(staging_directory, "/dump/interactions.csv")
-curl::curl_download(
+httr::GET(
 	url="http://www.guidetopharmacology.org/DATA/interactions.csv",
-	destfile=interactions_fname)
+	httr::write_disk(interactions_fname, overwrite=TRUE))
 
 
 zinc_ids <- Zr::catalog_items(
@@ -60,7 +60,7 @@ zinc_ids <- Zr::catalog_items(
 		"supplier_code",
 		"substance.preferred_name",
 		"substance.smiles"),
-	result_batch_size=10000,
+	result_batch_size=100,
 	verbose=T) %>%
 	dplyr::select(
 		zinc_id,
@@ -68,7 +68,7 @@ zinc_ids <- Zr::catalog_items(
 		preferred_name = substance.preferred_name,
 		zinc_smiles = substance.smiles)
 zinc_ids %>% readr::write_tsv(
-	paste0(staging_directory, "/data/zinc_ids.tsvs"))
+	paste0(staging_directory, "/data/zinc_ids.tsv"))
 
 
 ##################################
@@ -96,7 +96,7 @@ uniprot_mapping <- pantry %>%
 		by=c("uniprot_accn")) %>%
 	dplyr::collect(n=Inf)
 
-pantry %>% BioChemPantry::drop_table("uniprot_mapping")
+#pantry %>% BioChemPantry::drop_table("uniprot_mapping")
 
 ############################################33
 
