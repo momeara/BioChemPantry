@@ -126,8 +126,11 @@ get_schemas <- function(pantry, verbose=T){
 	if(verbose){
 		cat("Current schema: ", BioChemPantry::get_search_path(pantry), "\n", sep="")
 	}
+	schema_tbl <- dbplyr::build_sql(
+			"SELECT schema_name FROM information_schema.schemata",
+			con = pantry)
 	pantry %>%
-		dplyr::tbl(dbplyr::build_sql("SELECT schema_name FROM information_schema.schemata")) %>%
+		dplyr::tbl(schema_tbl) %>%
 		dplyr::arrange(schema_name) %>%
 		dplyr::collect() %>%
 		data.frame
