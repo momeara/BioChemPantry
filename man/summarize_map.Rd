@@ -4,18 +4,20 @@
 \alias{summarize_map}
 \title{Diagnostics for messy joins}
 \usage{
-summarize_map(data, xcols, ycols, n_examples = 4, verbose = F)
+summarize_map(data, x_cols, y_cols, n_examples = 4, verbose = FALSE)
 }
-\description{
-given a data frame with two ways to group rows,
- summarize and give examples of situations where the mapping is not 1-1
-}
-\details{
-data <- data.frame(
-	x=c(1,2,NA,3,4,5,6,6,6,7,7),
-	y=c("a",NA,"c","d","d","d","e","f","g","h","h"))
+\arguments{
+\item{x_cols}{tidyselect specification of a set of columns defining objects}
 
-> summarize_map(data, "x", "y")
+\item{y_cols}{tidyselect specification of a set of columns defining objects
+
+data <- data.frame(
+    x=c(1,2,NA,3,4,5,6,6,6,7,7),
+    y=c("a",NA,"c","d","d","d","e","f","g","h","h"))
+
+data %>% summarize_map(
+  x_cols = x),
+  y_cols = y))
 X<-[x]:
   |X|: 7                          # number of groups
   |is.na.X|: 1                    # number of groups with NA in atleaset 1 col
@@ -55,5 +57,9 @@ $dup.Y
   y x
 1 d 3
 2 d 4
-3 d 5
+3 d 5}
+}
+\description{
+given a data frame with two ways to group rows,
+ summarize and give examples of situations where the mapping is not 1-1
 }

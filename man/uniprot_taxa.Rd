@@ -4,8 +4,7 @@
 \alias{uniprot_taxa}
 \title{Get all taxa below a given ancestor taxa}
 \usage{
-uniprot_taxa(ancestor = 7711, reviewed = TRUE, format = "tab",
-  verbose = F)
+uniprot_taxa(ancestor = 7711, reviewed = TRUE, format = "tab", verbose = F)
 }
 \description{
 Get all taxa below a given ancestor taxa

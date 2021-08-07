@@ -4,8 +4,12 @@
 \alias{uniprot_entry_web_lookup}
 \title{Get lookup info for given uniprot entries one at a time}
 \usage{
-uniprot_entry_web_lookup(uniprot_entries, columns = c("entry name"),
-  format = "tab", verbose = FALSE)
+uniprot_entry_web_lookup(
+  uniprot_entries,
+  columns = c("entry name"),
+  format = "tab",
+  verbose = FALSE
+)
 }
 \description{
 #http://www.uniprot.org/help/uniprotkb_column_names
