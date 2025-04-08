@@ -1,6 +1,3 @@
-# -*- tab-width:2;indent-tabs-mode:t;show-trailing-whitespace:t;rm-trailing-spaces:t -*-
-# vi: set ts=2 noet:
-
 #' Get and check login information for Postgres database
 #'
 #' @param pantry_config either the name of a json file with config information or
